@@ -64,16 +64,17 @@ public class BluetoothHelperService {
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType) {
         Log.d(TAG, "connected, Socket Type:" + socketType);
+        mState = STATE_CONNECTED;
+        mConnectedThread = new ConnectedThread(socket, socketType);
+        mConnectedThread.start();
+
         if(mHandler!=null){
             Message msg = new Message();
             msg.obj = device;
             msg.what = MessageType.MESSAGE_CONNECTED;
-
-            mHandler.sendMessage(msg);
+            mHandler.sendMessageDelayed(msg,2000);
         }
-        mState = STATE_CONNECTED;
-        mConnectedThread = new ConnectedThread(socket, socketType);
-        mConnectedThread.start();
+
     }
 
     /**
@@ -246,6 +247,7 @@ public class BluetoothHelperService {
          * @param buffer  The bytes to write
          */
         public void write(byte[] buffer) {
+            Log.i(TAG, "BEGIN mConnectedThread write");
             try {
                 mmOutStream.write(buffer);
                 mmOutStream.flush();
