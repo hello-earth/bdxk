@@ -23,4 +23,5 @@ dependencies {
     compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.0.2'
     compile 'com.android.support:appcompat-v7:25.2.0'
     compile 'com.android.support:recyclerview-v7:25.2.0'
+    compile 'com.mylhyl:circleDialog:2.1.6'
 }

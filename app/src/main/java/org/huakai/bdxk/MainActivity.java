@@ -14,13 +14,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 
-import org.huakai.bdxk.view.BluetoothHelperService;
+import org.huakai.bdxk.common.BluetoothHelperService;
+import org.huakai.bdxk.common.MessageType;
 
 import java.util.ArrayList;
 
@@ -122,6 +122,11 @@ public class MainActivity extends AppCompatActivity{
         @Override
         public void handleMessage(Message msg) {
             Toast.makeText(getApplicationContext(), msg.obj.toString(), Toast.LENGTH_SHORT).show();
+            switch (msg.what){
+                case MessageType.MESSAGE_CONNECTED:
+
+                    break;
+            }
         }
     };
 }

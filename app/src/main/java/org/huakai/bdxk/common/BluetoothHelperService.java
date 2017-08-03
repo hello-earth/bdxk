@@ -1,14 +1,12 @@
-package org.huakai.bdxk.view;
+package org.huakai.bdxk.common;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,6 +67,7 @@ public class BluetoothHelperService {
         if(mHandler!=null){
             Message msg = new Message();
             msg.obj = "connectd "+device.getName();
+            msg.what = MessageType.MESSAGE_CONNECTED;
             mHandler.sendMessage(msg);
         }
         mConnectedThread = new ConnectedThread(socket, socketType);
@@ -224,7 +223,7 @@ public class BluetoothHelperService {
                     bytes = mmInStream.read(buffer);
                     if(mHandler!=null){
                         Message msg = new Message();
-                        msg.obj = bytes;
+                        msg.obj = "bytes";
                         mHandler.sendMessage(msg);
                     }
                     Log.d(TAG,"run rev "+bytes+" bytes.");
