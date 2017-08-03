@@ -66,10 +66,12 @@ public class BluetoothHelperService {
         Log.d(TAG, "connected, Socket Type:" + socketType);
         if(mHandler!=null){
             Message msg = new Message();
-            msg.obj = "connectd "+device.getName();
+            msg.obj = device;
             msg.what = MessageType.MESSAGE_CONNECTED;
+
             mHandler.sendMessage(msg);
         }
+        mState = STATE_CONNECTED;
         mConnectedThread = new ConnectedThread(socket, socketType);
         mConnectedThread.start();
     }
@@ -147,7 +149,7 @@ public class BluetoothHelperService {
         public void run() {
             Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
-
+            mState = STATE_CONNECTING;
             try {
                 // This is a blocking call and will only return on a
                 // successful connection or an exception
@@ -215,14 +217,15 @@ public class BluetoothHelperService {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
-
+            Message msg = new Message();
+            msg.what =  -1;
             // Keep listening to the InputStream while connected
-            while (mmInStream!=null) {
+            while (mmInStream!=null && mmSocket.isConnected()) {
                 try {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     if(mHandler!=null){
-                        Message msg = new Message();
+                        msg.what = MessageType.MESSAGE_READ;
                         msg.obj = "bytes";
                         mHandler.sendMessage(msg);
                     }
@@ -235,6 +238,7 @@ public class BluetoothHelperService {
                     break;
                 }
             }
+            mHandler.sendMessage(msg);
         }
 
         /**
@@ -244,7 +248,7 @@ public class BluetoothHelperService {
         public void write(byte[] buffer) {
             try {
                 mmOutStream.write(buffer);
-
+                mmOutStream.flush();
                 if(mHandler!=null)
                     mHandler.obtainMessage(0, -1, -1, buffer)
                             .sendToTarget();

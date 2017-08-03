@@ -1,11 +1,15 @@
 package org.huakai.bdxk;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import org.huakai.bdxk.db.DevicesCollectionHelper;
+
 import java.util.ArrayList;
 
 /**
@@ -16,6 +20,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnCl
 
     private ArrayList<BluetoothDevice> ScanResultss = new ArrayList<>();
     private OnItemClickListener mOnItemClickListener = null;
+    private  static  DevicesCollectionHelper devicesHelper;
 
     @Override
     public void onClick(View v) {
@@ -33,8 +38,10 @@ public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnCl
     }
 
 
-    public DeviceListAdapter(ArrayList<BluetoothDevice> _ScanResultss) {
+    public DeviceListAdapter(Context context, ArrayList<BluetoothDevice> _ScanResultss) {
         ScanResultss = _ScanResultss;
+        devicesHelper =  new DevicesCollectionHelper(context);
+        devicesHelper.open();
     }
 
     @Override
@@ -48,9 +55,13 @@ public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnCl
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         BluetoothDevice result = ScanResultss.get(position);
-        String name = result.getName();
-        if(name==null || "".equals(name))
-            name = result.getAddress();
+        String name = devicesHelper.getDescByMac(result.getAddress());
+        if(name==null || "".equals(name)){
+            name = result.getName();
+            if(name==null || "".equals(name)){
+                name = result.getAddress();
+            }
+        }
         ((MyViewHolder)holder).tv.setText(name);
         ((MyViewHolder)holder).id_rssi.setText(result.describeContents()+"");
         holder.itemView.setTag(position);
