@@ -6,8 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,17 +14,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Toast;
-
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-
-import org.huakai.bdxk.common.BluetoothHelperService;
-import org.huakai.bdxk.common.ByteUtils;
-import org.huakai.bdxk.common.MessageType;
+import org.huakai.bdxk.activity.DeviceDetailActivity;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
 
@@ -40,7 +34,6 @@ public class MainActivity extends AppCompatActivity{
     private RefreshLayout refreshLayout;
     private Context mContext;
     private BluetoothAdapter mBtAdapter;
-    private BluetoothHelperService mChatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,8 +49,6 @@ public class MainActivity extends AppCompatActivity{
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         refreshLayout.setEnableLoadmore(false);
         mBtAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        mChatService = new BluetoothHelperService(this, mHandler);
 
         initListener();
         if(mBtAdapter.isEnabled())
@@ -82,9 +73,8 @@ public class MainActivity extends AppCompatActivity{
         adapter.setOnItemClickListener(new DeviceListAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view , int position){
-                mChatService.stop();
                 CustomLoadView.getInstance(MainActivity.this).showProgress();
-                mChatService.connect(ScanResults.get(position), false);
+                onInputDeviceName(ScanResults.get(position));
             }
         });
     }
@@ -124,11 +114,12 @@ public class MainActivity extends AppCompatActivity{
     };
 
 
-    private void onInputDeviceName(final Object obj){
-        final BluetoothDevice device = (BluetoothDevice)obj;
+    private void onInputDeviceName(final BluetoothDevice device){
         final DevicesCollectionHelper devicesHelper =  new DevicesCollectionHelper(getApplicationContext());
         devicesHelper.open();
-        if(devicesHelper.isHasDeviceInfo(device,"")!=-1) {
+        long flag = devicesHelper.isHasDeviceInfo(device,"");
+        CustomLoadView.getInstance(MainActivity.this).dismissProgress();
+        if(flag!=-1) {
             new CircleDialog.Builder(MainActivity.this)
                     .setCanceledOnTouchOutside(false)
                     .setCancelable(true)
@@ -143,7 +134,7 @@ public class MainActivity extends AppCompatActivity{
                     .setPositiveInput("确定", new OnInputClickListener() {
                         @Override
                         public void onClick(String text, View v) {
-                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
                             long flag = devicesHelper.insertNewsCollectionInfo(device, text);
                             if (flag == -1) {
                                 Toast.makeText(mContext, "该节点已在数据库中存在", Toast.LENGTH_SHORT).show();
@@ -151,6 +142,7 @@ public class MainActivity extends AppCompatActivity{
                                 Toast.makeText(mContext, "该备注已存在，请保证备注名称的唯一性", Toast.LENGTH_SHORT).show();
                             }else if(flag==1){
                                 Toast.makeText(mContext, "操作成功", Toast.LENGTH_SHORT).show();
+                                nextActivity(device);
                             }
                         }
                     })
@@ -158,24 +150,15 @@ public class MainActivity extends AppCompatActivity{
         }
         else{
             Toast.makeText(mContext, "已备注", Toast.LENGTH_SHORT).show();
-            String orderHex = "AA7501000E000000000000000000170803162239C1";
-            byte[] data = ByteUtils.hexStringToBytes(orderHex);
-            mChatService.write(data);
+            nextActivity(device);
         }
     }
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            CustomLoadView.getInstance(MainActivity.this).dismissProgress();
-            switch (msg.what){
-                case MessageType.MESSAGE_CONNECTED:
-                    onInputDeviceName(msg.obj);
-                    break;
-                case MessageType.MESSAGE_READ:
-                    Toast.makeText(mContext, msg.obj.toString(), Toast.LENGTH_SHORT).show();
-                    break;
-            }
-        }
-    };
+    private void nextActivity(BluetoothDevice device){
+        Intent intent = new Intent();
+        intent.setClass(MainActivity.this, DeviceDetailActivity.class);
+        intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
+        startActivity(intent);
+    }
+
 }

@@ -1,0 +1,114 @@
+package org.huakai.bdxk.activity;
+
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Toast;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.BluetoothHelperService;
+import org.huakai.bdxk.common.ByteUtils;
+import org.huakai.bdxk.common.MessageType;
+import org.huakai.bdxk.view.CustomLoadView;
+
+import java.util.ArrayList;
+
+/**
+ * Created by Administrator on 2017/8/4.
+ */
+
+public class DeviceDetailActivity  extends AppCompatActivity {
+    private RecyclerView mRecyclerView;
+    private ArrayList<String> menus = new ArrayList<>();
+    private DeviceDetailAdapter adapter;
+    private RefreshLayout refreshLayout;
+    private Context mContext;
+    private BluetoothAdapter mBtAdapter;
+    private BluetoothHelperService mChatService;
+    private BluetoothDevice device;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        mContext = this;
+        initMenu();
+        initView();
+        initListener();
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        mChatService = new BluetoothHelperService(this, mHandler);
+        mChatService.connect(device,false);
+    }
+
+    private void initView(){
+        refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
+        mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new DeviceDetailAdapter(this,menus);
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+        refreshLayout.setEnableLoadmore(false);
+        refreshLayout.setEnableRefresh(false);
+    }
+
+    private void initListener(){
+        adapter.setOnItemClickListener(new DeviceDetailAdapter.OnItemClickListener(){
+            @Override
+            public void onItemClick(View view , int position){
+                Toast.makeText(mContext, menus.get(position), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initMenu(){
+        menus.add("传感器信息");
+        menus.add("采集数据");
+        menus.add("传感器调零");
+        menus.add("设置备注信息");
+        menus.add("设置自编号");
+        menus.add("设置型号");
+        menus.add("设置标定信息");
+        menus.add("读取标定信息");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mBtAdapter != null) {
+            mBtAdapter.cancelDiscovery();
+        }
+    }
+
+    private void sendCmd(){
+        String orderHex = "AA7501000E000000000000000000170803162239C1";
+        byte[] data = ByteUtils.hexStringToBytes(orderHex);
+        mChatService.write(data);
+    }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            CustomLoadView.getInstance(DeviceDetailActivity.this).dismissProgress();
+            switch (msg.what){
+                case MessageType.MESSAGE_CONNECTED:
+                    sendCmd();
+                    break;
+                case MessageType.MESSAGE_READ:
+                    Toast.makeText(mContext, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
+}
