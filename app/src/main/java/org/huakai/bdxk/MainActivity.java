@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity{
         }
         else{
             Toast.makeText(mContext, "已备注", Toast.LENGTH_SHORT).show();
-            String orderHex = "337501000E00000000000000000017080316223900";
+            String orderHex = "AA7501000E000000000000000000170803162239C1";
             byte[] data = ByteUtils.hexStringToBytes(orderHex);
             mChatService.write(data);
         }
@@ -171,6 +171,9 @@ public class MainActivity extends AppCompatActivity{
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
                     onInputDeviceName(msg.obj);
+                    break;
+                case MessageType.MESSAGE_READ:
+                    Toast.makeText(mContext, msg.obj.toString(), Toast.LENGTH_SHORT).show();
                     break;
             }
         }

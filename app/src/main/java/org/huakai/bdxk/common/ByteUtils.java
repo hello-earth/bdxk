@@ -35,20 +35,24 @@ public class ByteUtils {
         }
         hexString = hexString.toUpperCase();
         int length = hexString.length() / 2;
-        char[] hexChars = hexString.toCharArray();
         byte[] d = new byte[length];
-        for (int i = 0; i < length; i++) {
-            int pos = i * 2;
-            d[i] = (byte) (charToByte(hexChars[pos]) << 4 | charToByte(hexChars[pos + 1]));
+        for (int j = 0; j < length;j++) {
+            int i = j*2;
+            d[j] = (byte) Integer.parseInt(hexString.substring(i,i+2), 16);
         }
         return d;
     }
-    /**
-     * Convert char to byte
-     * @param c char
-     * @return byte
-     */
-    private static byte charToByte(char c) {
-        return (byte) "0123456789ABCDEF".indexOf(c);
+
+    public static String byteToHexStr(byte[] b) {
+        String stmp = "";
+        StringBuilder sb = new StringBuilder("");
+        for (int n = 0; n < b.length; n++) {
+            stmp = Integer.toHexString(b[n] & 0xFF);
+            sb.append((stmp.length() == 1) ? "0" + stmp : stmp);
+            sb.append(" ");
+        }
+        return sb.toString().toUpperCase().trim();
     }
+
+
 }

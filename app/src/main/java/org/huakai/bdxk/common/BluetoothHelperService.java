@@ -72,7 +72,7 @@ public class BluetoothHelperService {
             Message msg = new Message();
             msg.obj = device;
             msg.what = MessageType.MESSAGE_CONNECTED;
-            mHandler.sendMessageDelayed(msg,2000);
+            mHandler.sendMessage(msg);
         }
 
     }
@@ -217,20 +217,29 @@ public class BluetoothHelperService {
         public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
-            int bytes;
+            int length=0, datalength = 0;
+            String respond = "";
             Message msg = new Message();
             msg.what =  -1;
+
             // Keep listening to the InputStream while connected
             while (mmInStream!=null && mmSocket.isConnected()) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-                    if(mHandler!=null){
-                        msg.what = MessageType.MESSAGE_READ;
-                        msg.obj = "bytes";
-                        mHandler.sendMessage(msg);
+                    int bylen = mmInStream.read(buffer);
+                    byte[] tmp = new byte[bylen];
+                    length += bylen;
+                    System.arraycopy(buffer, 0, tmp, 0, bylen);
+                    respond += ByteUtils.byteToHexStr(tmp).replace(" ","");
+                    if(length>10 && datalength==0){
+                        datalength =  Integer.parseInt(respond.substring(6,10), 16);
                     }
-                    Log.d(TAG,"run rev "+bytes+" bytes.");
+                    if(respond.length()/2==datalength+7 && (mHandler!=null)){
+                        msg.what = MessageType.MESSAGE_READ;
+                        msg.obj = respond;
+                        mHandler.sendMessage(msg);
+                        Log.d(TAG,"data rev "+respond);
+                    }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     break;
@@ -251,9 +260,6 @@ public class BluetoothHelperService {
             try {
                 mmOutStream.write(buffer);
                 mmOutStream.flush();
-                if(mHandler!=null)
-                    mHandler.obtainMessage(0, -1, -1, buffer)
-                            .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }
