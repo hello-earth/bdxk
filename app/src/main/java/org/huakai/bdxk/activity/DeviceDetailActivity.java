@@ -32,7 +32,6 @@ public class DeviceDetailActivity  extends AppCompatActivity {
     private DeviceDetailAdapter adapter;
     private RefreshLayout refreshLayout;
     private Context mContext;
-    private BluetoothAdapter mBtAdapter;
     private BluetoothHelperService mChatService;
     private BluetoothDevice device;
 
@@ -44,10 +43,10 @@ public class DeviceDetailActivity  extends AppCompatActivity {
         initMenu();
         initView();
         initListener();
-        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mChatService = new BluetoothHelperService(this, mHandler);
         mChatService.connect(device,false);
+        CustomLoadView.getInstance(this).showProgress("正在连接设备");
     }
 
     private void initView(){
@@ -66,9 +65,37 @@ public class DeviceDetailActivity  extends AppCompatActivity {
         adapter.setOnItemClickListener(new DeviceDetailAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view , int position){
-                Toast.makeText(mContext, menus.get(position), Toast.LENGTH_SHORT).show();
+            onMenuClick(position);
             }
         });
+    }
+
+    private void onMenuClick(int position){
+        switch (position){
+            case 0:
+            default:
+                sendCmd(ByteUtils.getCmdHexStr("01"));
+                break;
+            case 1:
+                sendCmd(ByteUtils.getCmdHexStr("10"));
+                break;
+            case 2:
+                sendCmd(ByteUtils.getCmdHexStr("80"));
+                break;
+            case 3:
+                sendCmd(ByteUtils.getCmdHexStr("81"));
+                break;
+            case 4:
+                sendCmd(ByteUtils.getCmdHexStr("82"));
+                break;
+            case 5:
+                sendCmd(ByteUtils.getCmdHexStr("84"));
+                break;
+            case 6:
+                sendCmd(ByteUtils.getCmdHexStr("05"));
+                break;
+        }
+        Toast.makeText(mContext, menus.get(position), Toast.LENGTH_SHORT).show();
     }
 
     private void initMenu(){
@@ -85,13 +112,13 @@ public class DeviceDetailActivity  extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mBtAdapter != null) {
-            mBtAdapter.cancelDiscovery();
+        if (mChatService != null) {
+            mChatService.stop();
         }
     }
 
-    private void sendCmd(){
-        String orderHex = "AA7501000E000000000000000000170803162239C1";
+    private void sendCmd(String orderHex){
+        CustomLoadView.getInstance(this).showProgress("正在发送请求");
         byte[] data = ByteUtils.hexStringToBytes(orderHex);
         mChatService.write(data);
     }
@@ -102,7 +129,7 @@ public class DeviceDetailActivity  extends AppCompatActivity {
             CustomLoadView.getInstance(DeviceDetailActivity.this).dismissProgress();
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
-                    sendCmd();
+                    Toast.makeText(DeviceDetailActivity.this, "设备已连接", Toast.LENGTH_SHORT).show();
                     break;
                 case MessageType.MESSAGE_READ:
                     Toast.makeText(mContext, msg.obj.toString(), Toast.LENGTH_SHORT).show();

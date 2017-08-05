@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity{
                             } else if (flag == -2) {
                                 Toast.makeText(mContext, "该备注已存在，请保证备注名称的唯一性", Toast.LENGTH_SHORT).show();
                             }else if(flag==1){
-                                Toast.makeText(mContext, "操作成功", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(mContext, "操作成功", Toast.LENGTH_SHORT).show();
                                 nextActivity(device);
                             }
                         }
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity{
                     .show();
         }
         else{
-            Toast.makeText(mContext, "已备注", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(mContext, "已备注", Toast.LENGTH_SHORT).show();
             nextActivity(device);
         }
     }

@@ -230,7 +230,7 @@ public class BluetoothHelperService {
                     byte[] tmp = new byte[bylen];
                     length += bylen;
                     System.arraycopy(buffer, 0, tmp, 0, bylen);
-                    respond += ByteUtils.byteToHexStr(tmp).replace(" ","");
+                    respond += ByteUtils.byteToHexStr(tmp);
                     if(length>10 && datalength==0){
                         datalength =  Integer.parseInt(respond.substring(6,10), 16);
                     }
@@ -238,6 +238,11 @@ public class BluetoothHelperService {
                         msg.what = MessageType.MESSAGE_READ;
                         msg.obj = respond;
                         mHandler.sendMessage(msg);
+                        length=0;
+                        datalength = 0;
+                        respond = "";
+                        msg = new Message();
+                        msg.what =  -1;
                         Log.d(TAG,"data rev "+respond);
                     }
                 } catch (IOException e) {
