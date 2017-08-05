@@ -238,12 +238,12 @@ public class BluetoothHelperService {
                         msg.what = MessageType.MESSAGE_READ;
                         msg.obj = respond;
                         mHandler.sendMessage(msg);
+                        Log.d(TAG,"data rev "+respond);
                         length=0;
                         datalength = 0;
                         respond = "";
                         msg = new Message();
                         msg.what =  -1;
-                        Log.d(TAG,"data rev "+respond);
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
