@@ -12,6 +12,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 import com.mylhyl.circledialog.CircleDialog;
@@ -21,6 +22,7 @@ import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import org.huakai.bdxk.activity.DeviceDetailActivity;
+import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
 
@@ -55,6 +57,11 @@ public class MainActivity extends AppCompatActivity{
             doDiscovery();
         else
             Toast.makeText(mContext,"请先打开蓝牙开关",Toast.LENGTH_SHORT).show();
+
+
+        RespondDecoder decoder = new RespondDecoder("557A100035002820946508000034170806094018015418E6FFFC18E618E6A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D444358313502");
+        String result = decoder.getResult();
+        Log.i("MainActivity", result);
     }
 
     private void initListener(){
