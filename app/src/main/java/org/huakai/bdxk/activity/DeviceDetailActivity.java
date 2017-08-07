@@ -52,9 +52,11 @@ public class DeviceDetailActivity  extends AppCompatActivity {
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         sensorid = getIntent().getStringExtra(BluetoothDevice.EXTRA_NAME);
-        mChatService = new BluetoothHelperService(this, mHandler);
-        mChatService.connect(device,false);
-        CustomLoadView.getInstance(this).showProgress("正在连接设备");
+        mChatService = BluetoothHelperService.getInstance(this, mHandler);
+        if(!mChatService.isConnected()){
+            mChatService.connect(device,false);
+            CustomLoadView.getInstance(this).showProgress("正在连接设备");
+        }
     }
 
     private void initView(){

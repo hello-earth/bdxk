@@ -3,7 +3,10 @@ package org.huakai.bdxk.activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -12,11 +15,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 
 import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.BluetoothHelperService;
+import org.huakai.bdxk.common.MessageType;
+import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
+import org.huakai.bdxk.view.CustomLoadView;
 import org.huakai.bdxk.view.OnItemClickListener;
 import org.huakai.bdxk.view.SwipeRecyclerView;
 
@@ -27,7 +35,8 @@ import java.util.ArrayList;
  */
 
 public class SensorListActivity extends AppCompatActivity {
-    SwipeRecyclerView mRecyclerView ;
+    private SwipeRecyclerView mRecyclerView ;
+    private BluetoothHelperService mChatService;
     private ArrayList<SensorBean> sensorList = new ArrayList<>();
     private SensorAdapter adapter;
     private RefreshLayout refreshLayout;
@@ -46,6 +55,11 @@ public class SensorListActivity extends AppCompatActivity {
         initView();
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        mChatService = BluetoothHelperService.getInstance(this, mHandler);
+        if(!mChatService.isConnected()){
+            mChatService.connect(device,false);
+            CustomLoadView.getInstance(this).showProgress("正在连接设备");
+        }
     }
 
     private void initView(){
@@ -110,5 +124,18 @@ public class SensorListActivity extends AppCompatActivity {
         intent.putExtra(BluetoothDevice.EXTRA_NAME,sensorid);
         startActivity(intent);
     }
+
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            CustomLoadView.getInstance(SensorListActivity.this).dismissProgress();
+            switch (msg.what){
+                case MessageType.MESSAGE_CONNECTED:
+                    Toast.makeText(SensorListActivity.this, "设备已连接", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
 }

@@ -24,23 +24,34 @@ public class BluetoothHelperService {
     private static final UUID MY_UUID_INSECURE =
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String TAG = "BluetoothHelperService";
-    private int mState;
+    private static int mState;
     // Constants that indicate the current connection state
     public static final int STATE_NONE = 0;       // we're doing nothing
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
-    private Context mContext;
-    private final BluetoothAdapter mAdapter;
-    private final Handler mHandler;
-    private ConnectThread mConnectThread;
-    private ConnectedThread mConnectedThread;
+    private static Handler mHandler;
+    private static ConnectThread mConnectThread;
+    private static ConnectedThread mConnectedThread;
+    private static BluetoothHelperService bluetoothHelperService;
 
-    public BluetoothHelperService(Context context, Handler handler) {
-        mAdapter = BluetoothAdapter.getDefaultAdapter();
+    private BluetoothHelperService(Context context, Handler handler) {
         mState = STATE_NONE;
         mHandler = handler;
-        mContext = context;
+    }
+
+    public static BluetoothHelperService getInstance(Context context, Handler handler){
+        if(mState!=STATE_CONNECTED || bluetoothHelperService==null || mConnectedThread==null || !mConnectedThread.isConnected()){
+            bluetoothHelperService = new BluetoothHelperService(context,handler);
+        }else{
+            mHandler = handler;
+        }
+        return bluetoothHelperService;
+    }
+
+
+    public static boolean isConnected(){
+        return mState==STATE_CONNECTED && mConnectedThread.isConnected();
     }
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
@@ -234,10 +245,12 @@ public class BluetoothHelperService {
                     if(length>10 && datalength==0){
                         datalength =  Integer.parseInt(respond.substring(6,10), 16);
                     }
-                    if(respond.length()/2==datalength+7 && (mHandler!=null)){
-                        msg.what = MessageType.MESSAGE_READ;
-                        msg.obj = respond;
-                        mHandler.sendMessage(msg);
+                    if(respond.length()/2>=datalength+7){
+                        if (mHandler!=null){
+                            msg.what = MessageType.MESSAGE_READ;
+                            msg.obj = respond;
+                            mHandler.sendMessage(msg);
+                        }
                         Log.d(TAG,"data rev "+respond);
                         length=0;
                         datalength = 0;
@@ -276,6 +289,10 @@ public class BluetoothHelperService {
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }
+        }
+
+        public boolean isConnected(){
+            return mmSocket.isConnected();
         }
     }
 }
