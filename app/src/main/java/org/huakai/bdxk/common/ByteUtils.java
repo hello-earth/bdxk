@@ -82,9 +82,9 @@ public class ByteUtils {
         return d;
     }
 
-    public static String getCmdHexStr(String src){
+    public static String getCmdHexStr(String sensorid, String src){
         SimpleDateFormat df = new SimpleDateFormat("yyMMddHHmmss");
-        String cmd = "AA75"+src+"000E000000000000000000"+df.format(new Date());
+        String cmd = "AA75"+src+"000E00"+sensorid+df.format(new Date());
         int[] hexStr = hexStringToInt(cmd);
         int org = 0;
         for(int hex : hexStr){
@@ -93,7 +93,7 @@ public class ByteUtils {
         return cmd+Integer.toHexString(org);
     }
 
-    public static String getCmdHexStr(String src, String desc){
+    public static String getDecsCmdHexStr(String src, String desc){
         SimpleDateFormat df = new SimpleDateFormat("yyMMddHHmmss");
         int[] des = stringToInt(desc);
         String hexstr = "";

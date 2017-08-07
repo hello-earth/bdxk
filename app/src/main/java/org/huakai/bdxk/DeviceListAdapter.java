@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.huakai.bdxk.common.ScanResult;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 
 public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnClickListener{
 
-    private ArrayList<BluetoothDevice> ScanResultss = new ArrayList<>();
+    private ArrayList<ScanResult> ScanResultss = new ArrayList<>();
     private OnItemClickListener mOnItemClickListener = null;
     private  static  DevicesCollectionHelper devicesHelper;
 
@@ -38,7 +39,7 @@ public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnCl
     }
 
 
-    public DeviceListAdapter(Context context, ArrayList<BluetoothDevice> _ScanResultss) {
+    public DeviceListAdapter(Context context, ArrayList<ScanResult> _ScanResultss) {
         ScanResultss = _ScanResultss;
         devicesHelper =  new DevicesCollectionHelper(context);
         devicesHelper.open();
@@ -54,16 +55,16 @@ public class DeviceListAdapter extends RecyclerView.Adapter implements View.OnCl
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        BluetoothDevice result = ScanResultss.get(position);
-        String name = devicesHelper.getDescByMac(result.getAddress());
+        ScanResult result = ScanResultss.get(position);
+        String name = devicesHelper.getDescByMac(result.getDevice().getAddress());
         if(name==null || "".equals(name)){
-            name = result.getName();
+            name = result.getDevice().getName();
             if(name==null || "".equals(name)){
-                name = result.getAddress();
+                name = result.getDevice().getAddress();
             }
         }
         ((MyViewHolder)holder).tv.setText(name);
-        ((MyViewHolder)holder).id_rssi.setText(result.describeContents()+"");
+        ((MyViewHolder)holder).id_rssi.setText(result.getRssi()+"");
         holder.itemView.setTag(position);
     }
 

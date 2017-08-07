@@ -11,6 +11,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import org.huakai.bdxk.R;
@@ -34,6 +37,10 @@ public class DeviceDetailActivity  extends AppCompatActivity {
     private Context mContext;
     private BluetoothHelperService mChatService;
     private BluetoothDevice device;
+    private String sensorid;
+    private LinearLayout headBackLayout;
+    private ImageView titleLeft;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,7 @@ public class DeviceDetailActivity  extends AppCompatActivity {
         initView();
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+        sensorid = getIntent().getStringExtra(BluetoothDevice.EXTRA_NAME);
         mChatService = new BluetoothHelperService(this, mHandler);
         mChatService.connect(device,false);
         CustomLoadView.getInstance(this).showProgress("正在连接设备");
@@ -52,6 +60,9 @@ public class DeviceDetailActivity  extends AppCompatActivity {
     private void initView(){
         refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
         mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        ((TextView)findViewById(R.id.head_title)).setText("功能列表");
+        headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
+        titleLeft = (ImageView)findViewById(R.id.com_head_back);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DeviceDetailAdapter(this,menus);
         mRecyclerView.setAdapter(adapter);
@@ -68,31 +79,43 @@ public class DeviceDetailActivity  extends AppCompatActivity {
             onMenuClick(position);
             }
         });
+        titleLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeviceDetailActivity.this.finish();
+            }
+        });
+        headBackLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DeviceDetailActivity.this.finish();
+            }
+        });
     }
 
     private void onMenuClick(int position){
         switch (position){
             case 0:
             default:
-                sendCmd(ByteUtils.getCmdHexStr("01"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"01"));
                 break;
             case 1:
-                sendCmd(ByteUtils.getCmdHexStr("10"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"10"));
                 break;
             case 2:
-                sendCmd(ByteUtils.getCmdHexStr("80"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"80"));
                 break;
             case 3:
-                sendCmd(ByteUtils.getCmdHexStr("81"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"81"));
                 break;
             case 4:
-                sendCmd(ByteUtils.getCmdHexStr("82"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"82"));
                 break;
             case 5:
-                sendCmd(ByteUtils.getCmdHexStr("84"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"84"));
                 break;
             case 6:
-                sendCmd(ByteUtils.getCmdHexStr("05"));
+                sendCmd(ByteUtils.getCmdHexStr(sensorid,"05"));
                 break;
         }
         Toast.makeText(mContext, menus.get(position), Toast.LENGTH_SHORT).show();

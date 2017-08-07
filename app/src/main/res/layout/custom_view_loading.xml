@@ -14,18 +14,6 @@
         android:padding="20dp"
         android:orientation="vertical" >
 
-        <!--<com.xinhuanet.pushliving.View.ProgressWheel-->
-            <!--android:id="@+id/pg_loading"-->
-            <!--android:layout_width="80dp"-->
-            <!--android:layout_height="80dp"-->
-            <!--app:matProg_barColor="#3780d9"-->
-            <!--app:matProg_barWidth="3.5dp"-->
-            <!--app:matProg_circleRadius="25dp"-->
-            <!--app:matProg_fillRadius="false"-->
-            <!--app:matProg_progressIndeterminate="true"-->
-            <!--app:matProg_rimColor="#dddddd"-->
-            <!--app:matProg_rimWidth="3.5dp" />-->
-
         <ProgressBar
             android:id="@+id/pg_loading"
             android:layout_width="wrap_content"
