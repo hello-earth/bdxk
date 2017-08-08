@@ -48,7 +48,7 @@ public class DevicesCollectionHelper {
      //* @param info
      * @return
      */
-    public long insertNewsCollectionInfo(BluetoothDevice info, String description) {
+    public long insertDeviceCollectionInfo(BluetoothDevice info, String description) {
         long insertCount = isHasDeviceInfo(info,description);
         if (insertCount==0) {
             ContentValues values = new ContentValues();

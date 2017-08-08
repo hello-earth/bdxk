@@ -22,7 +22,7 @@ import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-import org.huakai.bdxk.activity.DeviceDetailActivity;
+
 import org.huakai.bdxk.activity.SensorListActivity;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.ScanResult;
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity{
                         @Override
                         public void onClick(String text, View v) {
 //                            Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
-                            long flag = devicesHelper.insertNewsCollectionInfo(device, text);
+                            long flag = devicesHelper.insertDeviceCollectionInfo(device, text);
                             if (flag == -1) {
                                 Toast.makeText(mContext, "该节点已在数据库中存在", Toast.LENGTH_SHORT).show();
                             } else if (flag == -2) {

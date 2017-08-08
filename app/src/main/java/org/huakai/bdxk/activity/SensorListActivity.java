@@ -122,12 +122,12 @@ public class SensorListActivity extends AppCompatActivity {
     }
 
     private void initMenu(){
-        sensorList.add(new SensorBean("温度传感器1","2820946508000034"));
-        sensorList.add(new SensorBean("温度传感器2","2820946508000035"));
-        sensorList.add(new SensorBean("温度传感器3","2820946508000036"));
-        sensorList.add(new SensorBean("温度传感器4","2820946508000037"));
-        sensorList.add(new SensorBean("温度传感器5","2820946508000038"));
-        sensorList.add(new SensorBean("温度传感器6","2820946508000039"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000034","温度传感器1"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000035","温度传感器2"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000036","温度传感器3"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000037","温度传感器4"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000038","温度传感器5"));
+        sensorList.add(new SensorBean(device.getAddress(),"2820946508000039","温度传感器6"));
     }
 
     @Override

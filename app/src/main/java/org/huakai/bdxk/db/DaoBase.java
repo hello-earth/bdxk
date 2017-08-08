@@ -13,6 +13,7 @@ import android.util.Log;
 public class DaoBase extends SQLiteOpenHelper {
     public static final String DEVICE_LIST = "device_list";
     public static final String DATA_LIST = "data_list";
+    public static final String SENSOR_LIST = "sensor_list";
     private static final int DATABASE_VERSION = 1;
     private static String sDatabaseName = "dbhk.db";
     private static DaoBase sDaoBaseInstance = null;
@@ -33,14 +34,27 @@ public class DaoBase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        createDeviceChannels(db);
+        createDeviceDB(db);
+        createSensorDB(db);
     }
 
-    private void createDeviceChannels(SQLiteDatabase db) {
+    private void createDeviceDB(SQLiteDatabase db) {
         String info_sql = "CREATE TABLE IF NOT EXISTS " + DEVICE_LIST + "("
                 + DevicesCollectionColumn.DEVICES_ID + "  varchar(10)  default '',"
                 + DevicesCollectionColumn.DEVICES_DESC + " varchar(50)  default '',"
                 + DevicesCollectionColumn.DEVICES_MAC + " varchar(50)  default '')";
+        try {
+            db.execSQL(info_sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createSensorDB(SQLiteDatabase db) {
+        String info_sql = "CREATE TABLE IF NOT EXISTS " + SENSOR_LIST + "("
+                + SensorCollectionColumn.SENSOR_ID + "  varchar(28)  default '',"
+                + SensorCollectionColumn.SENSOR_DESC + " varchar(30)  default '',"
+                + SensorCollectionColumn.DEVICES_MAC + " varchar(50)  default '')";
         try {
             db.execSQL(info_sql);
         } catch (Exception e) {
@@ -54,6 +68,7 @@ public class DaoBase extends SQLiteOpenHelper {
         try {
             db.execSQL(" DROP TABLE IF EXISTS " + DEVICE_LIST);
             db.execSQL(" DROP TABLE IF EXISTS " + DATA_LIST);
+            db.execSQL(" DROP TABLE IF EXISTS " + SENSOR_LIST);
             onCreate(db);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -64,6 +79,7 @@ public class DaoBase extends SQLiteOpenHelper {
     public void deleteAllData() {
         execSQL("Delete from " + DEVICE_LIST);
         execSQL("Delete from " + DATA_LIST);
+        execSQL("Delete from " + SENSOR_LIST);
     }
 
     public Cursor select(String sql){
