@@ -1,6 +1,5 @@
 package org.huakai.bdxk.activity;
 
-import android.bluetooth.BluetoothDevice;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -24,7 +23,7 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.muti_input_dialog_layout);
+        setContentView(R.layout.activity_sensor_addcation);
         ((TextView)findViewById(R.id.head_title)).setText("添加传感器");
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
