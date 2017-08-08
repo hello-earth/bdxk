@@ -22,8 +22,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.DeviceDetailActivity" />
         <activity android:name=".activity.SensorListActivity" />
+        <activity android:name=".activity.DeviceDetailActivity" />
+        <activity android:name=".activity.SensorInputActivity" />
 
     </application>
 

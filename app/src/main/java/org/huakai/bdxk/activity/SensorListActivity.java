@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -45,6 +46,9 @@ public class SensorListActivity extends AppCompatActivity {
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
 
+    private LinearLayout headAddLayout;
+    private ImageView addButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class SensorListActivity extends AppCompatActivity {
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mChatService = BluetoothHelperService.getInstance(this, mHandler);
-        if(!mChatService.isConnected()){
+        if(!mChatService.isConnected() && device!=null){
             mChatService.connect(device,false);
             CustomLoadView.getInstance(this).showProgress("正在连接设备");
         }
@@ -67,7 +71,9 @@ public class SensorListActivity extends AppCompatActivity {
         mRecyclerView = (SwipeRecyclerView) findViewById(R.id.recyclerview);
         ((TextView)findViewById(R.id.head_title)).setText("传感器列表");
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
-        (findViewById(R.id.com_head_add_layout)).setVisibility(View.VISIBLE);
+        headAddLayout = (LinearLayout)findViewById(R.id.com_head_add_layout);
+        addButton = (ImageView)findViewById(R.id.com_head_add);
+        headAddLayout.setVisibility(View.VISIBLE);
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SensorAdapter(this, sensorList);
@@ -101,6 +107,18 @@ public class SensorListActivity extends AppCompatActivity {
                 SensorListActivity.this.finish();
             }
         });
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAddcaitonActivity();
+            }
+        });
+        headAddLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startAddcaitonActivity();
+            }
+        });
     }
 
     private void initMenu(){
@@ -122,6 +140,12 @@ public class SensorListActivity extends AppCompatActivity {
         intent.setClass(SensorListActivity.this, DeviceDetailActivity.class);
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
         intent.putExtra(BluetoothDevice.EXTRA_NAME,sensorid);
+        startActivity(intent);
+    }
+
+    private void startAddcaitonActivity(){
+        Intent intent = new Intent();
+        intent.setClass(SensorListActivity.this, SensorInputActivity.class);
         startActivity(intent);
     }
 
