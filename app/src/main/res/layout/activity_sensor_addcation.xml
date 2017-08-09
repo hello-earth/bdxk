@@ -70,12 +70,14 @@
         android:padding="6dp">
 
         <EditText
+            android:id="@+id/sensor_desc"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/bg_edit_comment"
             android:hint="传感器名称"/>
 
         <EditText
+            android:id="@+id/sensor_id"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/bg_edit_comment"

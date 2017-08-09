@@ -60,7 +60,7 @@ public class SensorCollectionHelper {
             values.put(SensorCollectionColumn.SENSOR_DESC, description);
             values.put(SensorCollectionColumn.DEVICES_MAC, mac);
             try {
-                insertCount = mSqlDB.insert(DaoBase.DEVICE_LIST, null, values);
+                insertCount = mSqlDB.insert(DaoBase.SENSOR_LIST, null, values);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -73,7 +73,7 @@ public class SensorCollectionHelper {
         SQLiteDatabase mSqlDB = mDbHelper.getReadableDatabase();
         String selection = SensorCollectionColumn.SENSOR_ID + "='" + sensorid + "'";
         try {
-            Cursor cursor = mSqlDB.query(DaoBase.DEVICE_LIST, null, selection, null, null,
+            Cursor cursor = mSqlDB.query(DaoBase.SENSOR_LIST, null, selection, null, null,
                     null, null);
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
@@ -118,7 +118,7 @@ public class SensorCollectionHelper {
      */
     public boolean delete(String sid) {
         String selection = SensorCollectionColumn.SENSOR_ID + "='" + sid + "'";
-        int ret = mSqlDB.delete(DaoBase.DEVICE_LIST, selection, null);
+        int ret = mSqlDB.delete(DaoBase.SENSOR_LIST, selection, null);
         return ret > 0 ? true : false;
     }
 
@@ -127,7 +127,7 @@ public class SensorCollectionHelper {
      */
     public boolean truncate()
     {
-        int ret = mSqlDB.delete(DaoBase.DEVICE_LIST, null, null);
+        int ret = mSqlDB.delete(DaoBase.SENSOR_LIST, null, null);
         return ret>0?true:false;
     }
 }

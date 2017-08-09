@@ -21,6 +21,7 @@ import org.huakai.bdxk.common.BluetoothHelperService;
 import org.huakai.bdxk.common.ByteUtils;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
+import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ public class DeviceDetailActivity  extends AppCompatActivity {
         adapter.setOnItemClickListener(new DeviceDetailAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(View view , int position){
-            onMenuClick(position);
+                onMenuClick(position);
             }
         });
         titleLeft.setOnClickListener(new View.OnClickListener() {
@@ -154,11 +155,11 @@ public class DeviceDetailActivity  extends AppCompatActivity {
             CustomLoadView.getInstance(DeviceDetailActivity.this).dismissProgress();
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
-                    Toast.makeText(DeviceDetailActivity.this, "设备已连接", Toast.LENGTH_SHORT).show();
+                    ToastUtil.makeTextAndShow("设备已连接");
                     break;
                 case MessageType.MESSAGE_READ:
                     RespondDecoder decoder = new RespondDecoder(msg.obj.toString());
-                    Toast.makeText(mContext, decoder.getResult(), Toast.LENGTH_SHORT).show();
+                    ToastUtil.makeTextAndShow(decoder.getResult());
                     break;
             }
         }

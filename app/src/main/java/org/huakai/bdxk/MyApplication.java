@@ -29,7 +29,7 @@ public class MyApplication  extends Application{
         sDaoBase = DaoBase.getInstance(sContext);
     }
 
-    public static Application getInstance() {
+    public static MyApplication getInstance() {
         if (null == sInstance) {
             sInstance = new MyApplication();
         }

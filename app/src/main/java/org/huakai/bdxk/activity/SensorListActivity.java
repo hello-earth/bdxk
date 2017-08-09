@@ -25,11 +25,14 @@ import org.huakai.bdxk.common.BluetoothHelperService;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
+import org.huakai.bdxk.common.ToastUtil;
+import org.huakai.bdxk.db.SensorCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
 import org.huakai.bdxk.view.OnItemClickListener;
 import org.huakai.bdxk.view.SwipeRecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/8/4.
@@ -45,17 +48,16 @@ public class SensorListActivity extends AppCompatActivity {
     private BluetoothDevice device;
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
-
+    private SensorCollectionHelper sensorHelper;
     private LinearLayout headAddLayout;
     private ImageView addButton;
-
+    private static List<SensorBean> sensorBeens = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor);
         mContext = this;
-        initMenu();
         initView();
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -64,6 +66,12 @@ public class SensorListActivity extends AppCompatActivity {
             mChatService.connect(device,false);
             CustomLoadView.getInstance(this).showProgress("正在连接设备");
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initMenu();
     }
 
     private void initView(){
@@ -92,7 +100,7 @@ public class SensorListActivity extends AppCompatActivity {
             }
             @Override
             public void onDeleteClick(int position) {
-                adapter.removeItem(position);
+                onSensorDelete(position);
             }
         });
         titleLeft.setOnClickListener(new View.OnClickListener() {
@@ -122,12 +130,19 @@ public class SensorListActivity extends AppCompatActivity {
     }
 
     private void initMenu(){
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000034","温度传感器1"));
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000035","温度传感器2"));
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000036","温度传感器3"));
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000037","温度传感器4"));
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000038","温度传感器5"));
-        sensorList.add(new SensorBean(device.getAddress(),"2820946508000039","温度传感器6"));
+        sensorList.clear();
+        sensorHelper =  new SensorCollectionHelper(this);
+        sensorHelper.open();
+        sensorBeens =sensorHelper.getAllSensors();
+        for(SensorBean sensor : sensorBeens)
+            sensorList.add(sensor);
+        adapter.notifyDataSetChanged();
+    }
+
+    private void onSensorDelete(int position){
+        adapter.removeItem(position);
+        sensorHelper.delete(sensorList.get(position).getSensorId());
+        sensorList.remove(position);
     }
 
     @Override
@@ -146,6 +161,7 @@ public class SensorListActivity extends AppCompatActivity {
     private void startAddcaitonActivity(){
         Intent intent = new Intent();
         intent.setClass(SensorListActivity.this, SensorInputActivity.class);
+        intent.putExtra("device_mac",device.getAddress());
         startActivity(intent);
     }
 
@@ -156,7 +172,7 @@ public class SensorListActivity extends AppCompatActivity {
             CustomLoadView.getInstance(SensorListActivity.this).dismissProgress();
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
-                    Toast.makeText(SensorListActivity.this, "设备已连接", Toast.LENGTH_SHORT).show();
+                    ToastUtil.makeTextAndShow("设备已连接");
                     break;
             }
         }
