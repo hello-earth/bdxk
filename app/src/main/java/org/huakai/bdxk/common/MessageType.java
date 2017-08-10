@@ -6,6 +6,7 @@ package org.huakai.bdxk.common;
 
 public class MessageType {
     // Message types sent from the BluetoothChatService Handler
+    public static final int MESSAGE_DISCONNECTED = 0;
     public static final int MESSAGE_CONNECTED = 1;
     public static final int MESSAGE_READ = 2;
     public static final int MESSAGE_WRITE = 3;

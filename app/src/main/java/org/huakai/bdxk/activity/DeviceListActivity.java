@@ -11,33 +11,35 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
 import com.mylhyl.circledialog.params.InputParams;
 import com.mylhyl.circledialog.view.listener.OnInputClickListener;
 import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
-
+import org.huakai.bdxk.MyApplication;
 import org.huakai.bdxk.R;
 import org.huakai.bdxk.common.ScanResult;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
+import org.huakai.bdxk.view.OnItemClickListener;
+import org.huakai.bdxk.view.SwipeRecyclerView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity{
+public class DeviceListActivity extends AppCompatActivity{
 
-    private RecyclerView mRecyclerView;
+    private SwipeRecyclerView mRecyclerView;
     private ArrayList<ScanResult> ScanResults = new ArrayList<>();
     private DeviceListAdapter adapter;
     private RefreshLayout refreshLayout;
     private Context mContext;
     private BluetoothAdapter mBtAdapter;
+    private long mExitTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity{
         (findViewById(R.id.com_head_add_layout)).setVisibility(View.GONE);
         ((TextView)findViewById(R.id.head_title)).setText("BDXK");
         refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
-        mRecyclerView = (RecyclerView)findViewById(R.id.recyclerview);
+        mRecyclerView = (SwipeRecyclerView)findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DeviceListAdapter(this,ScanResults);
         mRecyclerView.setAdapter(adapter);
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity{
 
 //        RespondDecoder decoder = new RespondDecoder("557A100035002820946508000034170806094018015418E6FFFC18E618E6A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D444358313502");
 //        String result = decoder.getResult();
-//        Log.i("MainActivity", result);
+//        Log.i("DeviceListActivity", result);
     }
 
     private void initListener(){
@@ -82,13 +84,18 @@ public class MainActivity extends AppCompatActivity{
                 doDiscovery();
             }
         });
-        adapter.setOnItemClickListener(new DeviceListAdapter.OnItemClickListener(){
+        mRecyclerView.setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(View view , int position){
-                CustomLoadView.getInstance(MainActivity.this).showProgress();
+            public void onItemClick(View view, int position) {
+                CustomLoadView.getInstance(DeviceListActivity.this).showProgress();
                 onInputDeviceName(ScanResults.get(position).getDevice());
             }
+            @Override
+            public void onDeleteClick(int position) {
+                ToastUtil.makeTextAndShow("rename");
+            }
         });
+
     }
 
     @Override
@@ -130,9 +137,9 @@ public class MainActivity extends AppCompatActivity{
         final DevicesCollectionHelper devicesHelper =  new DevicesCollectionHelper(getApplicationContext());
         devicesHelper.open();
         long flag = devicesHelper.isHasDeviceInfo(device,"");
-        CustomLoadView.getInstance(MainActivity.this).dismissProgress();
+        CustomLoadView.getInstance(DeviceListActivity.this).dismissProgress();
         if(flag!=-1) {
-            new CircleDialog.Builder(MainActivity.this)
+            new CircleDialog.Builder(DeviceListActivity.this)
                     .setCanceledOnTouchOutside(false)
                     .setCancelable(true)
                     .setTitle("初始化节点名称")
@@ -165,9 +172,24 @@ public class MainActivity extends AppCompatActivity{
 
     private void nextActivity(BluetoothDevice device){
         Intent intent = new Intent();
-        intent.setClass(MainActivity.this, SensorListActivity.class);
+        intent.setClass(DeviceListActivity.this, SensorListActivity.class);
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                ToastUtil.makeTextAndShow("再按一次退出");
+                mExitTime = System.currentTimeMillis();
+            } else {
+                MyApplication.getInstance().applicationExit();
+            }
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
 }

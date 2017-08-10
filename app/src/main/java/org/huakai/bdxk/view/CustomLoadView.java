@@ -4,6 +4,7 @@ package org.huakai.bdxk.view;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -26,6 +27,7 @@ public class CustomLoadView extends FrameLayout {
     private ProgressBar mPgLoading;
     private TextView mTvLoading;
     private FrameLayout mRootContainer;
+    private static int timeout = 0;
 
     public CustomLoadView(Context context) {
         super(context);
@@ -39,6 +41,16 @@ public class CustomLoadView extends FrameLayout {
 
     public static CustomLoadView getInstance(Context context) {
         mContext = context;
+        timeout = 0;
+        if (mProgressView == null) {
+            mProgressView = new CustomLoadView(context);
+        }
+        return mProgressView;
+    }
+
+    public static CustomLoadView getInstance(Context context,int _timeout) {
+        mContext = context;
+        timeout = _timeout;
         if (mProgressView == null) {
             mProgressView = new CustomLoadView(context);
         }
@@ -94,6 +106,13 @@ public class CustomLoadView extends FrameLayout {
                 mRootContainer.addView(this);
                 setLoadingMsg(message);
                 setLodingVisible(true);
+                if(timeout>0)
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            dismissProgress();
+                        }
+                    },timeout);
             }
         }
     }

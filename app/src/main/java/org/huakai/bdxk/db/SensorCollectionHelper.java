@@ -87,12 +87,13 @@ public class SensorCollectionHelper {
         return result;
     }
 
-    public List<SensorBean> getAllSensors(){
+    public List<SensorBean> getAllSensors(String dmac){
         List<SensorBean> sensorBean = new ArrayList<>();
         Cursor cursor = null;
         try {
             SQLiteDatabase mSqlDB = mDbHelper.getReadableDatabase();
-            cursor = mSqlDB.query(DaoBase.SENSOR_LIST, SensorCollectionColumn.PROJECTION, null, null, null, null, null);
+            cursor = mSqlDB.query(DaoBase.SENSOR_LIST, SensorCollectionColumn.PROJECTION, SensorCollectionColumn.DEVICES_MAC + " = ?",
+                    new String[]{dmac}, null, null, null);
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {

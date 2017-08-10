@@ -62,10 +62,6 @@ public class SensorListActivity extends AppCompatActivity {
         initListener();
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         mChatService = BluetoothHelperService.getInstance(this, mHandler);
-        if(!mChatService.isConnected() && device!=null){
-            mChatService.connect(device,false);
-            CustomLoadView.getInstance(this).showProgress("正在连接设备");
-        }
     }
 
     @Override
@@ -96,7 +92,7 @@ public class SensorListActivity extends AppCompatActivity {
         mRecyclerView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                nextActivity(device, sensorList.get(position).getSensorId());
+                nextActivity(device, sensorList.get(position).getSensorId(), sensorList.get(position).getSensorName());
             }
             @Override
             public void onDeleteClick(int position) {
@@ -130,19 +126,25 @@ public class SensorListActivity extends AppCompatActivity {
     }
 
     private void initMenu(){
+        if(!mChatService.isConnected() && device!=null){
+            mChatService.connect(device,false);
+            CustomLoadView.getInstance(this).showProgress("正在连接设备");
+        }else{
+            CustomLoadView.getInstance(this).showProgress("");
+        }
         sensorList.clear();
         sensorHelper =  new SensorCollectionHelper(this);
         sensorHelper.open();
-        sensorBeens =sensorHelper.getAllSensors();
+        sensorBeens =sensorHelper.getAllSensors(device.getAddress());
         for(SensorBean sensor : sensorBeens)
             sensorList.add(sensor);
         adapter.notifyDataSetChanged();
+        CustomLoadView.getInstance(this).dismissProgress();
     }
 
     private void onSensorDelete(int position){
-        adapter.removeItem(position);
         sensorHelper.delete(sensorList.get(position).getSensorId());
-        sensorList.remove(position);
+        adapter.removeItem(position);
     }
 
     @Override
@@ -150,11 +152,12 @@ public class SensorListActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void nextActivity(BluetoothDevice device, String sensorid){
+    private void nextActivity(BluetoothDevice device, String sensorid, String desc){
         Intent intent = new Intent();
-        intent.setClass(SensorListActivity.this, DeviceDetailActivity.class);
+        intent.setClass(SensorListActivity.this, SensorDetailActivity.class);
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
         intent.putExtra(BluetoothDevice.EXTRA_NAME,sensorid);
+        intent.putExtra("extra_desc",desc);
         startActivity(intent);
     }
 

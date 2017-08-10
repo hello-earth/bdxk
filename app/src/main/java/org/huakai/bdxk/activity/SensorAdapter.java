@@ -3,6 +3,7 @@ package org.huakai.bdxk.activity;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import org.huakai.bdxk.R;
@@ -32,6 +33,8 @@ public class SensorAdapter extends RecyclerView.Adapter {
         final MyViewHolder viewHolder = (MyViewHolder) holder;
         viewHolder.content.setText(mList.get(position).getSensorName());
         viewHolder.mac.setText(mList.get(position).getSensorId());
+        viewHolder.bluetooth.setVisibility(View.GONE);
+        viewHolder.id_rssi.setVisibility(View.GONE);
     }
 
     @Override

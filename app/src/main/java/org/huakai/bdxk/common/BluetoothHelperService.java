@@ -51,7 +51,7 @@ public class BluetoothHelperService {
 
 
     public static boolean isConnected(){
-        return mState==STATE_CONNECTED && mConnectedThread.isConnected();
+        return mState==STATE_CONNECTED && mConnectedThread!=null && mConnectedThread.isConnected();
     }
     /**
      * Start the ConnectThread to initiate a connection to a remote device.
@@ -232,27 +232,29 @@ public class BluetoothHelperService {
             int length=0, datalength = 0;
             String respond = "";
             Message msg = new Message();
-            msg.what =  -1;
+            msg.what = MessageType.MESSAGE_DISCONNECTED;
 
             // Keep listening to the InputStream while connected
             while (mmInStream!=null && mmSocket.isConnected()) {
                 try {
                     // Read from the InputStream
                     int bylen = mmInStream.read(buffer);
+                    if(bylen==0)
+                        continue;
                     byte[] tmp = new byte[bylen];
                     length += bylen;
                     System.arraycopy(buffer, 0, tmp, 0, bylen);
                     respond += ByteUtils.byteToHexStr(tmp);
-                    if(length>10 && datalength==0){
+                    if(length>=10 && datalength==0){
                         datalength =  Integer.parseInt(respond.substring(6,10), 16);
                     }
-                    if(respond.length()/2>=datalength+7){
+                    if(datalength!=0 && respond.length()/2>=datalength+7){
                         if (mHandler!=null){
                             msg.what = MessageType.MESSAGE_READ;
                             msg.obj = respond;
                             mHandler.sendMessage(msg);
                         }
-                        Log.d(TAG,"data rev "+respond);
+                        Log.d(TAG,"respond's length="+respond.length()+" and datalength's length="+datalength + ". \ndata rev "+respond);
                         length=0;
                         datalength = 0;
                         respond = "";
@@ -260,10 +262,11 @@ public class BluetoothHelperService {
                         msg.what =  -1;
                     }
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected", e);
+                    msg.what = MessageType.MESSAGE_DISCONNECTED;
                     break;
                 } catch (Exception e){
                     e.printStackTrace();
+                    msg.what = MessageType.MESSAGE_DISCONNECTED;
                     break;
                 }
             }
