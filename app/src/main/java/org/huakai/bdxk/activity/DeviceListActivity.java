@@ -88,11 +88,12 @@ public class DeviceListActivity extends AppCompatActivity{
             @Override
             public void onItemClick(View view, int position) {
                 CustomLoadView.getInstance(DeviceListActivity.this).showProgress();
-                onInputDeviceName(ScanResults.get(position).getDevice());
+                onInputDeviceName(ScanResults.get(position).getDevice(),false);
             }
             @Override
             public void onDeleteClick(int position) {
-                ToastUtil.makeTextAndShow("rename");
+                CustomLoadView.getInstance(DeviceListActivity.this).showProgress();
+                onInputDeviceName(ScanResults.get(position).getDevice(),true);
             }
         });
 
@@ -133,10 +134,12 @@ public class DeviceListActivity extends AppCompatActivity{
     };
 
 
-    private void onInputDeviceName(final BluetoothDevice device){
-        final DevicesCollectionHelper devicesHelper =  new DevicesCollectionHelper(getApplicationContext());
+    private void onInputDeviceName(final BluetoothDevice device, final boolean isRename){
+        final DevicesCollectionHelper devicesHelper = new DevicesCollectionHelper(getApplicationContext());
         devicesHelper.open();
-        long flag = devicesHelper.isHasDeviceInfo(device,"");
+        long flag = 0;
+        if(!isRename)
+            flag = devicesHelper.isHasDeviceInfo(device,"");
         CustomLoadView.getInstance(DeviceListActivity.this).dismissProgress();
         if(flag!=-1) {
             new CircleDialog.Builder(DeviceListActivity.this)
@@ -153,13 +156,18 @@ public class DeviceListActivity extends AppCompatActivity{
                     .setPositiveInput("确定", new OnInputClickListener() {
                         @Override
                         public void onClick(String text, View v) {
+                            if(isRename)
+                                devicesHelper.delete(device.getAddress());
                             long flag = devicesHelper.insertDeviceCollectionInfo(device, text);
                             if (flag == -1) {
                                 ToastUtil.makeTextAndShow("该节点已在数据库中存在");
                             } else if (flag == -2) {
                                 ToastUtil.makeTextAndShow("该备注已存在，请保证备注名称的唯一性");
                             }else if(flag==1){
-                                nextActivity(device);
+                                if(isRename)
+                                    adapter.notifyDataSetChanged();
+                                else
+                                    nextActivity(device);
                             }
                         }
                     })

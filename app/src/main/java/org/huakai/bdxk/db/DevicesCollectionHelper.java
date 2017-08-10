@@ -105,8 +105,8 @@ public class DevicesCollectionHelper {
     /**
      * 删除
      */
-    public boolean delete(String description) {
-        String selection = DevicesCollectionColumn.DEVICES_DESC + "='" + description + "'";
+    public boolean delete(String mac) {
+        String selection = DevicesCollectionColumn.DEVICES_MAC + "='" + mac + "'";
         int ret = mSqlDB.delete(DaoBase.DEVICE_LIST, selection, null);
         return ret > 0 ? true : false;
     }

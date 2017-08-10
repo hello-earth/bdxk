@@ -26,6 +26,7 @@ import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
 import org.huakai.bdxk.common.ToastUtil;
+import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.db.SensorCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
 import org.huakai.bdxk.view.OnItemClickListener;
@@ -73,7 +74,6 @@ public class SensorListActivity extends AppCompatActivity {
     private void initView(){
         refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
         mRecyclerView = (SwipeRecyclerView) findViewById(R.id.recyclerview);
-        ((TextView)findViewById(R.id.head_title)).setText("传感器列表");
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
         headAddLayout = (LinearLayout)findViewById(R.id.com_head_add_layout);
         addButton = (ImageView)findViewById(R.id.com_head_add);
@@ -139,6 +139,10 @@ public class SensorListActivity extends AppCompatActivity {
         for(SensorBean sensor : sensorBeens)
             sensorList.add(sensor);
         adapter.notifyDataSetChanged();
+        DevicesCollectionHelper devicesHelper =  new DevicesCollectionHelper(this);
+        devicesHelper.open();
+        String name = devicesHelper.getDescByMac(device.getAddress());
+        ((TextView)findViewById(R.id.head_title)).setText("传感器列表("+name+")");
         CustomLoadView.getInstance(this).dismissProgress();
     }
 
