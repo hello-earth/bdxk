@@ -25,7 +25,7 @@
         <activity android:name=".activity.SensorListActivity" />
         <activity android:name=".activity.SensorInputActivity" />
         <activity android:name=".activity.SensorDetailActivity" />
-
+        <activity android:name=".activity.SensorCommonActivity" />
 
     </application>
 

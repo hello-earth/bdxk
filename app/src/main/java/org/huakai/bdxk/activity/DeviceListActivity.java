@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import org.huakai.bdxk.MyApplication;
 import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.ScanResult;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
@@ -66,9 +68,13 @@ public class DeviceListActivity extends AppCompatActivity{
             ToastUtil.makeTextAndShow("请先打开蓝牙开关");
 
 
-//        RespondDecoder decoder = new RespondDecoder("557A100035002820946508000034170806094018015418E6FFFC18E618E6A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D444358313502");
-//        String result = decoder.getResult();
-//        Log.i("DeviceListActivity", result);
+//        RespondDecoder decoder = new RespondDecoder();
+//        if(decoder.initData("557A100035002820946508000034170811152308FFFF18E1FFFF18E118E1A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D44435831352B")) {
+//            String result = decoder.getResult();
+//            Log.i("DeviceListActivity", result);
+//        }else{
+//            ToastUtil.makeTextAndShow("应答数据校验不正确");
+//        }
     }
 
     private void initListener(){

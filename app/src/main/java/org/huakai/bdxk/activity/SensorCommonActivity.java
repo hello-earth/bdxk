@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -30,14 +29,13 @@ import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
-import org.huakai.bdxk.view.DashboardView;
 
 /**
- * Created by Administrator on 2017/8/4.
+ * Created by Administrator on 2017/8/11.
  */
 
-public class SensorDetailActivity extends AppCompatActivity implements View.OnClickListener{
-    private DashboardView dashboardView;
+public class SensorCommonActivity extends AppCompatActivity implements View.OnClickListener  {
+
     private Context mContext;
     private BluetoothHelperService mChatService;
     private BluetoothDevice device;
@@ -47,14 +45,14 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
     private ImageView titleLeft;
     private LinearLayout headSettingLayout;
     private ImageView settingButton;
-    private TextView date;
+    private TextView dataView;
     private LinearLayout headReloadLayout;
     private ImageView reloadButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sensor_detail_layout);
+        setContentView(R.layout.activity_sensor_common);
         mContext = this;
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         sensorid = getIntent().getStringExtra(BluetoothDevice.EXTRA_NAME);
@@ -79,15 +77,11 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         ((TextView)findViewById(R.id.head_title)).setText("传感器数据");
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
-        ((TextView)findViewById(R.id.sensor_desc)).setText(desc);
-        ((TextView)findViewById(R.id.sensor_id)).setText(sensorid);
-        dashboardView = (DashboardView)findViewById(R.id.dashboard_view);
         headSettingLayout = (LinearLayout)findViewById(R.id.com_head_setting_layout);
         settingButton = (ImageView)findViewById(R.id.com_head_setting);
         reloadButton = (ImageView)findViewById(R.id.com_head_reload);
         headReloadLayout = (LinearLayout)findViewById(R.id.com_head_reload_layout);
-
-        date = (TextView)findViewById(R.id.sensor_date);
+        dataView = (TextView)findViewById(R.id.sensor_data);
     }
 
     private void initListener(){
@@ -115,7 +109,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
     private void sendCmd(String orderHex){
         if(!mChatService.isConnected()){
             mChatService.connect(device,false);
-            CustomLoadView.getInstance(SensorDetailActivity.this).showProgress("设备连接已断开\n正在重新连接");
+            CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("设备连接已断开\n正在重新连接");
         }else {
             CustomLoadView.getInstance(this, 30000).showProgress("正在发送请求");
             byte[] data = ByteUtils.hexStringToBytes(orderHex);
@@ -126,11 +120,11 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            CustomLoadView.getInstance(SensorDetailActivity.this).dismissProgress();
+            CustomLoadView.getInstance(SensorCommonActivity.this).dismissProgress();
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
                     ToastUtil.makeTextAndShow("设备已连接");
-                    CustomLoadView.getInstance(SensorDetailActivity.this).showProgress("正在发送请求");
+                    CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("正在发送请求");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -144,7 +138,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
                 case MessageType.MESSAGE_DISCONNECTED:
                     if(!mChatService.isConnected()){
                         mChatService.connect(device,false);
-                        CustomLoadView.getInstance(SensorDetailActivity.this).showProgress("设备连接已断开\n正在重新连接");
+                        CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("设备连接已断开\n正在重新连接");
                     }
                     break;
             }
@@ -156,7 +150,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         switch (v.getId()){
             case R.id.com_head_back:
             case R.id.com_head_back_layout:
-                SensorDetailActivity.this.finish();
+                SensorCommonActivity.this.finish();
                 break;
             case R.id.com_head_setting:
             case R.id.com_head_setting_layout:
@@ -227,10 +221,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         RespondDecoder decoder = new RespondDecoder();
         if(decoder.initData(data)) {
             if (decoder.getRequestId().equals("10") || decoder.getRequestId().equals("0F")) {
-                float tmp = decoder.getTemperature();
-                tmp = (float) (Math.round(tmp * 100)) / 100;
-                dashboardView.setRealTimeValue(tmp);
-                date.setText(decoder.getMeasurementDate());
+                dataView.setText(decoder.getResult());
             } else if (decoder.getRequestId().equals("01")) {
                 showData("传感器信息", decoder.getResult());
             }
@@ -247,4 +238,5 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
                 .setPositive("确定", null)
                 .show();
     }
+
 }

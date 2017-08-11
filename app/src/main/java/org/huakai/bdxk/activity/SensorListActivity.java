@@ -158,7 +158,7 @@ public class SensorListActivity extends AppCompatActivity {
 
     private void nextActivity(BluetoothDevice device, String sensorid, String desc){
         Intent intent = new Intent();
-        intent.setClass(SensorListActivity.this, SensorDetailActivity.class);
+        intent.setClass(SensorListActivity.this, SensorCommonActivity.class);
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
         intent.putExtra(BluetoothDevice.EXTRA_NAME,sensorid);
         intent.putExtra("extra_desc",desc);
