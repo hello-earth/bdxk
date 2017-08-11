@@ -71,7 +71,7 @@ public class SwipeRecyclerView extends RecyclerView {
                 if (mDeleteBtnState == 0) {
                     View view = findChildViewUnder(x, y);
                     if (view == null) {
-                        return false;
+                        return true;
                     }
 
                     MyViewHolder viewHolder = (MyViewHolder) getChildViewHolder(view);
@@ -100,9 +100,9 @@ public class SwipeRecyclerView extends RecyclerView {
 
                 break;
             case MotionEvent.ACTION_MOVE:
+                if(mItemLayout==null)break;
                 int dx = mLastX - x;
                 int dy = mLastY - y;
-
                 int scrollX = mItemLayout.getScrollX();
                 if (Math.abs(dx) > Math.abs(dy)) {//左边界检测
                     isItemMoving = true;
@@ -117,6 +117,9 @@ public class SwipeRecyclerView extends RecyclerView {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+                if(mItemLayout==null){
+                    break;
+                }
                 if (!isItemMoving && !isDragging && mListener != null) {
                     mListener.onItemClick(mItemLayout, mPosition);
                 }

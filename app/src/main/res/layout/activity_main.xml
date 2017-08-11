@@ -20,7 +20,7 @@
 
         <com.scwang.smartrefresh.layout.header.BezierRadarHeader
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <org.huakai.bdxk.view.SwipeRecyclerView
             android:id="@+id/recyclerview"
