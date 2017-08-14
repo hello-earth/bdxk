@@ -11,9 +11,9 @@ import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.mylhyl.circledialog.CircleDialog;
 import com.mylhyl.circledialog.callback.ConfigInput;
@@ -23,7 +23,6 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import org.huakai.bdxk.MyApplication;
 import org.huakai.bdxk.R;
-import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.ScanResult;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
@@ -39,6 +38,7 @@ public class DeviceListActivity extends AppCompatActivity{
     private ArrayList<ScanResult> ScanResults = new ArrayList<>();
     private DeviceListAdapter adapter;
     private RefreshLayout refreshLayout;
+    private LinearLayout emptylayout;
     private Context mContext;
     private BluetoothAdapter mBtAdapter;
     private long mExitTime;
@@ -52,6 +52,7 @@ public class DeviceListActivity extends AppCompatActivity{
         (findViewById(R.id.com_head_add_layout)).setVisibility(View.GONE);
         ((TextView)findViewById(R.id.head_title)).setText("BDXK");
         refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
+        emptylayout = (LinearLayout) findViewById(R.id.emptylayout);
         mRecyclerView = (SwipeRecyclerView)findViewById(R.id.recyclerview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DeviceListAdapter(this,ScanResults);
@@ -67,7 +68,8 @@ public class DeviceListActivity extends AppCompatActivity{
         else
             ToastUtil.makeTextAndShow("请先打开蓝牙开关");
 
-
+        mRecyclerView.setVisibility(View.GONE);
+        emptylayout.setVisibility(View.VISIBLE);
 //        RespondDecoder decoder = new RespondDecoder();
 //        if(decoder.initData("557A100035002820946508000034170811152308FFFF18E1FFFF18E118E1A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D44435831352B")) {
 //            String result = decoder.getResult();
@@ -127,6 +129,8 @@ public class DeviceListActivity extends AppCompatActivity{
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                emptylayout.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 ScanResults.add(new ScanResult(device,intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI)));
                 adapter.notifyDataSetChanged();
@@ -185,6 +189,10 @@ public class DeviceListActivity extends AppCompatActivity{
     }
 
     private void nextActivity(BluetoothDevice device){
+        // If we're already discovering, stop it
+        if (mBtAdapter.isDiscovering()) {
+            mBtAdapter.cancelDiscovery();
+        }
         Intent intent = new Intent();
         intent.setClass(DeviceListActivity.this, SensorListActivity.class);
         intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);

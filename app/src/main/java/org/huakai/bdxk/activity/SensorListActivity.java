@@ -45,6 +45,7 @@ public class SensorListActivity extends AppCompatActivity {
     private ArrayList<SensorBean> sensorList = new ArrayList<>();
     private SensorAdapter adapter;
     private RefreshLayout refreshLayout;
+    private LinearLayout emptylayout;
     private Context mContext;
     private BluetoothDevice device;
     private LinearLayout headBackLayout;
@@ -86,6 +87,7 @@ public class SensorListActivity extends AppCompatActivity {
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setEnableRefresh(false);
+        emptylayout = (LinearLayout) findViewById(R.id.emptylayout);
     }
 
     private void initListener(){
@@ -132,6 +134,8 @@ public class SensorListActivity extends AppCompatActivity {
         }else{
             CustomLoadView.getInstance(this).showProgress("");
         }
+        mRecyclerView.setVisibility(View.GONE);
+        emptylayout.setVisibility(View.VISIBLE);
         sensorList.clear();
         sensorHelper =  new SensorCollectionHelper(this);
         sensorHelper.open();
@@ -139,6 +143,8 @@ public class SensorListActivity extends AppCompatActivity {
         for(SensorBean sensor : sensorBeens)
             sensorList.add(sensor);
         adapter.notifyDataSetChanged();
+        emptylayout.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
         DevicesCollectionHelper devicesHelper =  new DevicesCollectionHelper(this);
         devicesHelper.open();
         String name = devicesHelper.getDescByMac(device.getAddress());

@@ -22,12 +22,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <org.huakai.bdxk.view.SwipeRecyclerView
-            android:id="@+id/recyclerview"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:background="#fff" />
+            android:layout_height="match_parent">
+            <org.huakai.bdxk.view.SwipeRecyclerView
+                android:id="@+id/recyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"
+                android:background="#fff"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:id="@+id/emptylayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="vertical" >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="点击+添加传感器" />
+            </LinearLayout>
+        </FrameLayout>
 
         <!--<com.scwang.smartrefresh.layout.footer.BallPulseFooter-->
         <!--android:layout_width="match_parent"-->

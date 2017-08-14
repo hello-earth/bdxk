@@ -319,13 +319,15 @@ public class RespondDecoder {
     public float StringRedressHz(){
         return (float)(Integer.parseInt(srchex.substring(90,94),16)*0.1);
     }
+
+
     public String get0FStr(){
         String result= "";
         result += "传感器型号："+get0FModel()+"\n";
         result += "传感器编号：" +get0FIdentifier()+"\n";
         result += "测量日期："+get0FMeasurementDate()+"\n";
         int[] data = get0FType();
-        result += "传感器类型："+data[0]+"; 小数点位数："+data[1]+"\n";
+        result += "传感器类型："+data[0]+"；小数点位数："+data[1]+"\n";
         result += "温度："+get0FTemperature()+"℃\n";
         result += "弦一频率："+String1Hz()+"Hz\n";
         result += "弦二频率："+String2Hz()+"Hz\n";
@@ -364,7 +366,7 @@ public class RespondDecoder {
         result += "传感器型号："+getModel()+"\n";
         result += "生产日期："+getProductionDate()+"\n";
         int[] data = getType();
-        result += "传感器类型："+data[0]+"; 小数点位数："+data[1]+"\n";
+        result += "传感器类型："+data[0]+"；小数点位数："+data[1]+"\n";
         result += "温度补偿系数："+getPPM()+"ppm/℃\n";
         result += "调零点频率："+get0hz()+"Hz\n";
         result += "传感器应变单位："+getProductionUnit()+"\n";
@@ -377,6 +379,11 @@ public class RespondDecoder {
         return result;
     }
 
+    public String get10SavingStr(){
+        String result= "";
+        result += getIdentifier()+","+getMeasurementDate()+","+getTemperature()+","+getOffsetVaule()+","+get10IdentifierSetting();
+        return result;
+    }
 
     public String getResult(){
         String result= "";

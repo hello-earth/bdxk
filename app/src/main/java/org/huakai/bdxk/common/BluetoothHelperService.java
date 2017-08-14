@@ -284,6 +284,10 @@ public class BluetoothHelperService {
                 mmOutStream.flush();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
+                Message msg = new Message();
+                msg.what = MessageType.MESSAGE_DISCONNECTED;
+                mHandler.sendMessage(msg);
+                this.cancel();
             }
         }
 

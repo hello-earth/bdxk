@@ -26,6 +26,7 @@ import com.mylhyl.circledialog.params.TitleParams;
 import org.huakai.bdxk.R;
 import org.huakai.bdxk.common.BluetoothHelperService;
 import org.huakai.bdxk.common.ByteUtils;
+import org.huakai.bdxk.common.Dataloger;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.ToastUtil;
@@ -235,6 +236,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
                 showData("传感器信息", decoder.getResult());
             }
             Log.d("DeviceDetailActivity", decoder.getResult());
+            new Thread(new Dataloger(sensorid,decoder.getResult())).start();
         }else{
             ToastUtil.makeTextAndShow("应答数据校验不正确");
         }
