@@ -5,9 +5,22 @@
                 android:layout_height="match_parent"
                 android:background="#fff">
 
-    <include
+    <RelativeLayout
         android:id="@+id/head_title_layout"
-        layout="@layout/activity_common_header" />
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#4169E1">
+
+        <TextView
+            android:id="@+id/head_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:textSize="16dp"
+            android:textColor="#ffffff" />
+
+    </RelativeLayout>
 
     <com.scwang.smartrefresh.layout.SmartRefreshLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"

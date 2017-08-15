@@ -171,6 +171,7 @@ public class RespondDecoder {
         tmp = (float) (Math.round(tmp * 100)) / 100;
         return tmp;
     }
+
     public float get0FTemperature(){
         int temp = Integer.parseInt(srchex.substring(58,62),16);
         if(temp>10000){
@@ -381,24 +382,32 @@ public class RespondDecoder {
 
     public String get10SavingStr(){
         String result= "";
-        result += getIdentifier()+","+getMeasurementDate()+","+getTemperature()+","+getOffsetVaule()+","+get10IdentifierSetting();
+        try {
+            result += getIdentifier()+","+getMeasurementDate()+","+getTemperature()+","+getOffsetVaule();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
         return result;
     }
 
     public String getResult(){
         String result= "";
-        if(!"".equals(srchex) && srchexint!=null) {
-            switch (srchexint[2]){
-                case 0x01:
-                    result = get01Str();
-                    break;
-                case 0x10:
-                    result = get10Str();
-                    break;
-                case 0x0F:
-                    result = get0FStr();
-                    break;
+        try {
+            if (!"".equals(srchex) && srchexint != null) {
+                switch (srchexint[2]) {
+                    case 0x01:
+                        result = get01Str();
+                        break;
+                    case 0x10:
+                        result = get10Str();
+                        break;
+                    case 0x0F:
+                        result = get0FStr();
+                        break;
+                }
             }
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
         return result;
     }

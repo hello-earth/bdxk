@@ -34,8 +34,8 @@ public class SensorBean implements Parcelable {
         return sensor_id;
     }
 
-    public void setSensorId(String sensor_mac) {
-        this.sensor_id = sensor_mac;
+    public void setSensorId(String sensor_id) {
+        this.sensor_id = sensor_id;
     }
 
     public void setSensorName(String sensor_name) {

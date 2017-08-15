@@ -68,6 +68,7 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
                     SensorCollectionHelper sensorHelper = new SensorCollectionHelper(this);
                     sensorHelper.open();
                     sensorHelper.insertSensorCollectionInfo(address,sensorDesc.getText().toString(),sensorId.getText().toString());
+                    sensorHelper.close();
                     SensorInputActivity.this.finish();
                 }
                 break;

@@ -23,11 +23,13 @@ import com.mylhyl.circledialog.params.DialogParams;
 import com.mylhyl.circledialog.params.TitleParams;
 
 import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.BlueCmdMgr;
 import org.huakai.bdxk.common.BluetoothHelperService;
 import org.huakai.bdxk.common.ByteUtils;
 import org.huakai.bdxk.common.Dataloger;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
+import org.huakai.bdxk.common.SensorBean;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 
@@ -38,10 +40,9 @@ import org.huakai.bdxk.view.CustomLoadView;
 public class SensorCommonActivity extends AppCompatActivity implements View.OnClickListener  {
 
     private Context mContext;
-    private BluetoothHelperService mChatService;
     private BluetoothDevice device;
-    private String sensorid;
-    private String desc;
+    private static BlueCmdMgr cmdMgr;
+    private SensorBean sensor;
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
     private LinearLayout headSettingLayout;
@@ -56,9 +57,9 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_sensor_common);
         mContext = this;
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        sensorid = getIntent().getStringExtra(BluetoothDevice.EXTRA_NAME);
-        desc = getIntent().getStringExtra("extra_desc");
-        mChatService = BluetoothHelperService.getInstance(this, mHandler);
+        sensor = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_NAME);
+        BluetoothHelperService mChatService = BluetoothHelperService.getInstance(this, mHandler);
+        cmdMgr = BlueCmdMgr.getInstance(this,mChatService,device);
         initView();
         initListener();
     }
@@ -66,11 +67,13 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
     @Override
     protected void onResume() {
         super.onResume();
-        if(!mChatService.isConnected()){
-            mChatService.connect(device,false);
-            CustomLoadView.getInstance(this).showProgress("正在连接设备");
-        }else{
-            initData();
+        if(cmdMgr!=null) {
+            if (!cmdMgr.isConnected()) {
+                CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("正在连接设备");
+                cmdMgr.connect();
+            } else {
+                initData();
+            }
         }
     }
 
@@ -80,8 +83,9 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
         headSettingLayout = (LinearLayout)findViewById(R.id.com_head_setting_layout);
         settingButton = (ImageView)findViewById(R.id.com_head_setting);
-        reloadButton = (ImageView)findViewById(R.id.com_head_reload);
-        headReloadLayout = (LinearLayout)findViewById(R.id.com_head_reload_layout);
+        reloadButton = (ImageView)findViewById(R.id.com_head_add);
+        reloadButton.setBackgroundResource(R.mipmap.ic_action_reload);
+        headReloadLayout = (LinearLayout)findViewById(R.id.com_head_add_layout);
         dataView = (TextView)findViewById(R.id.sensor_data);
     }
 
@@ -96,27 +100,17 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
 
 
     private void initData(){
-        sendCmd(ByteUtils.getCmdHexStr(sensorid,"10"));
+        CustomLoadView.getInstance(SensorCommonActivity.this,300000).showProgress("正在发送请求");
+        cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"01"));
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mChatService != null) {
-            mChatService.stop();
-        }
-    }
-
-    private void sendCmd(String orderHex){
-        if(!mChatService.isConnected()){
-            mChatService.connect(device,false);
-            CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("设备连接已断开\n正在重新连接");
-        }else {
-            CustomLoadView.getInstance(this, 30000).showProgress("正在发送请求");
-            byte[] data = ByteUtils.hexStringToBytes(orderHex);
-            mChatService.write(data);
-        }
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        if (cmdMgr != null) {
+//            cmdMgr.stop();
+//        }
+//    }
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -137,9 +131,9 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
                     onReciveData(msg.obj.toString());
                     break;
                 case MessageType.MESSAGE_DISCONNECTED:
-                    if(!mChatService.isConnected()){
-                        mChatService.connect(device,false);
-                        CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("设备连接已断开\n正在重新连接");
+                    if(!cmdMgr.isConnected()){
+                        CustomLoadView.getInstance(SensorCommonActivity.this).showProgress("正在连接设备");
+                        cmdMgr.connect();
                     }
                     break;
             }
@@ -157,8 +151,8 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
             case R.id.com_head_setting_layout:
                 showMenu();
                 break;
-            case R.id.com_head_reload:
-            case R.id.com_head_reload_layout:
+            case R.id.com_head_add:
+            case R.id.com_head_add_layout:
                 initData();
                 break;
         }
@@ -166,7 +160,7 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
 
 
     private void showMenu(){
-        final String[] items = {"传感器信息", "传感器调零","详细数据", "设置标定信息"};
+        final String[] items = {"传感器信息", "采集数据", "传感器调零", "详细数据"};
         new CircleDialog.Builder(this)
                 .configDialog(new ConfigDialog() {
                     @Override
@@ -202,18 +196,22 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
 
     private void onMenuClick(int position){
         switch (position){
-            case 0:
             default:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"01"));
+            case 0:
+                CustomLoadView.getInstance(SensorCommonActivity.this,30000).showProgress("正在发送请求");
+                cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"01"));
                 break;
             case 1:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"80"));
+                CustomLoadView.getInstance(SensorCommonActivity.this,30000).showProgress("正在发送请求");
+                cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"10"));
                 break;
             case 2:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"0F"));
+                CustomLoadView.getInstance(SensorCommonActivity.this,30000).showProgress("正在发送请求");
+                cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"80"));
                 break;
             case 3:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"84"));
+                CustomLoadView.getInstance(SensorCommonActivity.this,30000).showProgress("正在发送请求");
+                cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"0F"));
                 break;
         }
     }
@@ -221,13 +219,9 @@ public class SensorCommonActivity extends AppCompatActivity implements View.OnCl
     private void onReciveData(String data){
         RespondDecoder decoder = new RespondDecoder();
         if(decoder.initData(data)) {
-            if (decoder.getRequestId().equals("10") || decoder.getRequestId().equals("0F")) {
-                dataView.setText(decoder.getResult());
-            } else if (decoder.getRequestId().equals("01")) {
-                showData("传感器信息", decoder.getResult());
-            }
+            dataView.setText(decoder.getResult());
             Log.d("DeviceDetailActivity", decoder.getResult());
-            new Thread(new Dataloger(sensorid,decoder.get10SavingStr())).start();
+//            new Thread(new Dataloger(sensorid,decoder.get10SavingStr())).start();
         }else{
             ToastUtil.makeTextAndShow("应答数据校验不正确");
         }

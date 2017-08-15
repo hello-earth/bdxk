@@ -54,7 +54,7 @@ public class SensorCollectionHelper {
      */
     public long insertSensorCollectionInfo(String mac, String description, String sensorid) {
         long insertCount = 0;
-        if (!isHasSensorInfo(sensorid)) {
+//        if (!isHasSensorInfo(sensorid)) {
             ContentValues values = new ContentValues();
             values.put(SensorCollectionColumn.SENSOR_ID, sensorid);
             values.put(SensorCollectionColumn.SENSOR_DESC, description);
@@ -64,7 +64,7 @@ public class SensorCollectionHelper {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
+//        }
         return insertCount;
     }
 
@@ -93,7 +93,7 @@ public class SensorCollectionHelper {
         try {
             SQLiteDatabase mSqlDB = mDbHelper.getReadableDatabase();
             cursor = mSqlDB.query(DaoBase.SENSOR_LIST, SensorCollectionColumn.PROJECTION, SensorCollectionColumn.DEVICES_MAC + " = ?",
-                    new String[]{dmac}, null, null, null);
+                    new String[]{dmac}, null, null, SensorCollectionColumn.SENSOR_DESC);
             if (cursor != null) {
                 if (cursor.getCount() > 0) {
                     for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -117,8 +117,8 @@ public class SensorCollectionHelper {
     /**
      * 删除
      */
-    public boolean delete(String sid) {
-        String selection = SensorCollectionColumn.SENSOR_ID + "='" + sid + "'";
+    public boolean delete(String sid, String name) {
+        String selection = SensorCollectionColumn.SENSOR_ID + "='" + sid + "' and "+SensorCollectionColumn.SENSOR_DESC+ "='" + name + "'";
         int ret = mSqlDB.delete(DaoBase.SENSOR_LIST, selection, null);
         return ret > 0 ? true : false;
     }

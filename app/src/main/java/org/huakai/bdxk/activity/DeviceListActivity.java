@@ -48,9 +48,7 @@ public class DeviceListActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mContext = this;
-        (findViewById(R.id.com_head_back_layout)).setVisibility(View.GONE);
-        (findViewById(R.id.com_head_add_layout)).setVisibility(View.GONE);
-        ((TextView)findViewById(R.id.head_title)).setText("BDXK");
+        ((TextView)findViewById(R.id.head_title)).setText("无砟轨道板翘曲快速检测");
         refreshLayout = (RefreshLayout)findViewById(R.id.refreshLayout);
         emptylayout = (LinearLayout) findViewById(R.id.emptylayout);
         mRecyclerView = (SwipeRecyclerView)findViewById(R.id.recyclerview);

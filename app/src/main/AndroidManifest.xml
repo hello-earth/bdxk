@@ -26,7 +26,7 @@
         <activity android:name=".activity.SensorInputActivity" />
         <activity android:name=".activity.SensorDetailActivity" />
         <activity android:name=".activity.SensorCommonActivity" />
-
+        <activity android:name=".activity.CalibrateActivity" />
     </application>
 
 </manifest>

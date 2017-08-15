@@ -37,17 +37,32 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:paddingRight="25dp"
-        android:orientation="horizontal"
-        android:visibility="gone">
+        android:paddingRight="60dp"
+        android:orientation="horizontal"  >
 
         <ImageView
             android:id="@+id/com_head_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="15dp"
             android:background="@mipmap/header_add_btn"  />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/com_head_setting_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:paddingRight="18dp"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/com_head_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@mipmap/ic_sensor_setting"  />
     </LinearLayout>
 
 </RelativeLayout>

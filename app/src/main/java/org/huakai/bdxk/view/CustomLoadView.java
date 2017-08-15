@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.ToastUtil;
 
 
 public class CustomLoadView extends FrameLayout {
@@ -110,7 +111,10 @@ public class CustomLoadView extends FrameLayout {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            dismissProgress();
+                            if(CustomLoadView.this.getVisibility()==View.VISIBLE) {
+                                ToastUtil.makeTextAndShow("请求超时，请刷新重试");
+                                dismissProgress();
+                            }
                         }
                     },timeout);
             }

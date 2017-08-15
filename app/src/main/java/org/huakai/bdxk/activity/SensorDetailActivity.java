@@ -29,6 +29,7 @@ import org.huakai.bdxk.common.ByteUtils;
 import org.huakai.bdxk.common.Dataloger;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
+import org.huakai.bdxk.common.SensorBean;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 import org.huakai.bdxk.view.DashboardView;
@@ -42,8 +43,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
     private Context mContext;
     private BluetoothHelperService mChatService;
     private BluetoothDevice device;
-    private String sensorid;
-    private String desc;
+    private SensorBean sensor;
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
     private LinearLayout headSettingLayout;
@@ -58,8 +58,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         setContentView(R.layout.activity_sensor_detail_layout);
         mContext = this;
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-        sensorid = getIntent().getStringExtra(BluetoothDevice.EXTRA_NAME);
-        desc = getIntent().getStringExtra("extra_desc");
+        sensor = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_NAME);
         mChatService = BluetoothHelperService.getInstance(this, mHandler);
         initView();
         initListener();
@@ -80,13 +79,14 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         ((TextView)findViewById(R.id.head_title)).setText("传感器数据");
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
-        ((TextView)findViewById(R.id.sensor_desc)).setText(desc);
-        ((TextView)findViewById(R.id.sensor_id)).setText(sensorid);
+        ((TextView)findViewById(R.id.sensor_desc)).setText(sensor.getSensorName());
+        ((TextView)findViewById(R.id.sensor_id)).setText(sensor.getSensorId());
         dashboardView = (DashboardView)findViewById(R.id.dashboard_view);
         headSettingLayout = (LinearLayout)findViewById(R.id.com_head_setting_layout);
         settingButton = (ImageView)findViewById(R.id.com_head_setting);
-        reloadButton = (ImageView)findViewById(R.id.com_head_reload);
-        headReloadLayout = (LinearLayout)findViewById(R.id.com_head_reload_layout);
+        reloadButton = (ImageView)findViewById(R.id.com_head_add);
+        reloadButton.setBackgroundResource(R.mipmap.ic_action_reload);
+        headReloadLayout = (LinearLayout)findViewById(R.id.com_head_add_layout);
 
         date = (TextView)findViewById(R.id.sensor_date);
     }
@@ -102,7 +102,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
 
 
     private void initData(){
-        sendCmd(ByteUtils.getCmdHexStr(sensorid,"10"));
+        sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"10"));
     }
 
     @Override
@@ -163,8 +163,8 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
             case R.id.com_head_setting_layout:
                 showMenu();
                 break;
-            case R.id.com_head_reload:
-            case R.id.com_head_reload_layout:
+            case R.id.com_head_add:
+            case R.id.com_head_add_layout:
                 initData();
                 break;
         }
@@ -210,16 +210,16 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
         switch (position){
             case 0:
             default:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"01"));
+                sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"01"));
                 break;
             case 1:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"80"));
+                sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"80"));
                 break;
             case 2:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"0F"));
+                sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"0F"));
                 break;
             case 3:
-                sendCmd(ByteUtils.getCmdHexStr(sensorid,"84"));
+                sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(),"84"));
                 break;
         }
     }
@@ -236,7 +236,7 @@ public class SensorDetailActivity extends AppCompatActivity implements View.OnCl
                 showData("传感器信息", decoder.getResult());
             }
             Log.d("DeviceDetailActivity", decoder.getResult());
-            new Thread(new Dataloger(sensorid,decoder.getResult())).start();
+            new Thread(new Dataloger(sensor.getSensorId(),decoder.getResult())).start();
         }else{
             ToastUtil.makeTextAndShow("应答数据校验不正确");
         }
