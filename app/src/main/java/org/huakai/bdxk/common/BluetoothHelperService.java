@@ -254,7 +254,7 @@ public class BluetoothHelperService {
                             msg.obj = respond;
                             mHandler.sendMessage(msg);
                         }
-                        Log.d(TAG,"respond's length="+respond.length()+" and datalength's length="+datalength + ". \ndata rev "+respond);
+//                        Log.d(TAG,"respond's length="+respond.length()+" and datalength's length="+datalength + ". \ndata rev "+respond);
                         length=0;
                         datalength = 0;
                         respond = "";
