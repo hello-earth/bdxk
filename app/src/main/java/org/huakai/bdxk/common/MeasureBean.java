@@ -9,13 +9,13 @@ public class MeasureBean {
     private String identifier;
     private String measurementDate;
     private float temperature;
-    private float offsetVaule;
+    private float offsetValue;
 
-    public MeasureBean(String _identifier, String _measurementDate, float _temperature, float _offsetVaule){
+    public MeasureBean(String _identifier, String _measurementDate, float _temperature, float _offsetValue){
         this.identifier=_identifier;
         this.measurementDate = _measurementDate;
-        this.temperature = _temperature;
-        this.offsetVaule = _offsetVaule;
+        this.temperature = (float) (Math.round(_temperature * 100)) / 100;
+        this.offsetValue = (float) (Math.round(_offsetValue * 100)) / 100;;
     }
 
     public String getIdentifier(){
@@ -30,7 +30,11 @@ public class MeasureBean {
         return temperature;
     }
 
-    public float getOffsetVaule(){
-        return offsetVaule;
+    public float getOffsetValue(){
+        return offsetValue;
+    }
+
+    public String toString(){
+        return identifier+","+measurementDate+","+temperature+","+offsetValue;
     }
 }

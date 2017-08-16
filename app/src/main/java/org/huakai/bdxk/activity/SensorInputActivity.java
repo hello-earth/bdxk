@@ -3,14 +3,19 @@ package org.huakai.bdxk.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.huakai.bdxk.R;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.SensorCollectionHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2017/8/8.
@@ -22,9 +27,10 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
     private ImageView titleLeft;
     private LinearLayout headConfirmLayout;
     private TextView confirmButton;
-    private EditText sensorDesc;
+    private Spinner sensorDesc;
     private EditText sensorId;
     private String address;
+    private ArrayList<String> spinnerlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +39,7 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
         ((TextView)findViewById(R.id.head_title)).setText("添加传感器");
         address = getIntent().getExtras().getString("device_mac");
         initView();
+        initSpinnerData();
         initListener();
     }
 
@@ -41,9 +48,23 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
         headConfirmLayout = (LinearLayout) findViewById(R.id.com_head_add_confirm_layout);
         confirmButton = (TextView)findViewById(R.id.com_head_add_confirm);
-        sensorDesc = (EditText)findViewById(R.id.sensor_desc);
+        sensorDesc = (Spinner)findViewById(R.id.sensor_desc);
         sensorId = (EditText)findViewById(R.id.sensor_id);
         sensorDesc.requestFocus();
+    }
+
+    private void initSpinnerData() {
+        spinnerlist = new ArrayList<>();
+        spinnerlist.add("1号点");
+        spinnerlist.add("2号点");
+        spinnerlist.add("3号点");
+        spinnerlist.add("4号点");
+        spinnerlist.add("5号点");
+        spinnerlist.add("6号点");
+        spinnerlist.add("7号点");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, spinnerlist);
+        adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
+        sensorDesc.setAdapter(adapter);
     }
 
     private void initListener(){
@@ -67,7 +88,7 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
                 else {
                     SensorCollectionHelper sensorHelper = new SensorCollectionHelper(this);
                     sensorHelper.open();
-                    sensorHelper.insertSensorCollectionInfo(address,sensorDesc.getText().toString(),sensorId.getText().toString());
+                    sensorHelper.insertSensorCollectionInfo(address,spinnerlist.get(sensorDesc.getSelectedItemPosition()),sensorId.getText().toString());
                     sensorHelper.close();
                     SensorInputActivity.this.finish();
                 }
@@ -76,9 +97,8 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
     }
 
     private boolean inputAllhaveContent(){
-        String desc = sensorDesc.getText().toString();
         String id = sensorId.getText().toString();
-        return !"".equals(desc) && id.length()==16;
+        return id.length()==16;
     }
 
 

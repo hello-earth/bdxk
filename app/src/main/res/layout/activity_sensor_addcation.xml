@@ -69,20 +69,28 @@
         android:background="#e5e5e5"
         android:padding="6dp">
 
-        <EditText
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="点击选择传感器位置"
+            android:layout_marginBottom="3dp"/>
+        <Spinner
             android:id="@+id/sensor_desc"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_edit_comment"
-            android:hint="传感器名称"
-            android:text="温度传感器"/>
+            android:layout_height="60dp"
+            android:background="@drawable/bg_edit_comment"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="输入对应的传感器编号"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="3dp"/>
         <EditText
             android:id="@+id/sensor_id"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/bg_edit_comment"
-            android:layout_marginTop="8dp"
             android:hint="传感器编号(不需要空格)"
             android:text="2820946508000034"/>
 

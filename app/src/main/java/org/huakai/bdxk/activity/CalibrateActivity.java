@@ -1,19 +1,20 @@
 package org.huakai.bdxk.activity;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.mylhyl.circledialog.CircleDialog;
 
 import org.huakai.bdxk.R;
 import org.huakai.bdxk.common.BlueCmdMgr;
@@ -23,6 +24,7 @@ import org.huakai.bdxk.common.MeasureBean;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
+import org.huakai.bdxk.common.SharedPreferencesUtil;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 
@@ -32,24 +34,28 @@ import java.util.ArrayList;
  * Created by Administrator on 2017/8/15.
  */
 
-public class CalibrateActivity  extends AppCompatActivity {
+public class CalibrateActivity  extends AppCompatActivity implements View.OnClickListener{
 
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
-    private EditText editTextH;
-    private EditText editTextL;
-    private EditText editTextLimitH;
-    private RadioButton radioMale5600;
-    private RadioButton radioMale4925;
-    private RadioButton radioMale4856;
-    private RadioButton radio_vector1;
-    private RadioButton radio_vector2;
     private BluetoothDevice device;
     private ArrayList<SensorBean> sensorList;
     private static BlueCmdMgr cmdMgr;
     private Button firstmeasure;
     private Button secondmeasure;
-    private int which;
+    private Button testmeasure;
+    private LinearLayout headSettingLayout;
+    private ImageView settingButton;
+    private TextView firstView;
+    private TextView secondView;
+    private TextView thirdView;
+    private int which=-1;
+    private float bjg;
+    private float zyl;
+    private float xc;
+    private int MaleType;
+    private int vector;
+
     private ArrayList<ArrayList<MeasureBean>> MeasureBeans = new ArrayList<ArrayList<MeasureBean>>();
 
     @Override
@@ -57,8 +63,7 @@ public class CalibrateActivity  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibrate_layout);
         findViewById(R.id.com_head_add_layout).setVisibility(View.GONE);
-        findViewById(R.id.com_head_setting_layout).setVisibility(View.GONE);
-        ((TextView)findViewById(R.id.head_title)).setText("初始化标定信息");
+        ((TextView)findViewById(R.id.head_title)).setText("初始化修正系数");
         device = getIntent().getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
         sensorList = getIntent().getParcelableArrayListExtra(BluetoothDevice.EXTRA_NAME);
         BluetoothHelperService mChatService = BluetoothHelperService.getInstance(this, mHandler);
@@ -67,50 +72,40 @@ public class CalibrateActivity  extends AppCompatActivity {
         initListener();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        which=-1;
+//        cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensorList.get(0).getSensorId(),"10"));
+    }
+
     private void initView(){
         headBackLayout = (LinearLayout) findViewById(R.id.com_head_back_layout);
         titleLeft = (ImageView)findViewById(R.id.com_head_back);
-        editTextH = (EditText)findViewById(R.id.paramter_h);
-        editTextL = (EditText)findViewById(R.id.paramter_l);
-        editTextLimitH = (EditText)findViewById(R.id.paramter_limith);
-        radioMale5600 =(RadioButton)findViewById(R.id.radioMale5600);
-        radioMale4925 =(RadioButton)findViewById(R.id.radioMale4925);
-        radioMale4856 =(RadioButton)findViewById(R.id.radioMale4856);
-        radio_vector1 =(RadioButton)findViewById(R.id.radio_vector1);
-        radio_vector2 =(RadioButton)findViewById(R.id.radio_vector2);
-
+        headSettingLayout = (LinearLayout)findViewById(R.id.com_head_setting_layout);
+        settingButton = (ImageView)findViewById(R.id.com_head_setting);
         firstmeasure = (Button)findViewById(R.id.button1);
         secondmeasure = (Button)findViewById(R.id.button2);
+        testmeasure = (Button)findViewById(R.id.button3);
+        firstView = (TextView)findViewById(R.id.firstView);
+        secondView = (TextView)findViewById(R.id.secondView);
+        thirdView = (TextView)findViewById(R.id.thirdView);
+        firstView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        secondView.setMovementMethod(ScrollingMovementMethod.getInstance());
+        thirdView.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     private void initListener() {
-        View.OnClickListener finish = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CalibrateActivity.this.finish();
-            }
-        };
-        titleLeft.setOnClickListener(finish);
-        headBackLayout.setOnClickListener(finish);
+        titleLeft.setOnClickListener(this);
+        headBackLayout.setOnClickListener(this);
+        titleLeft.setOnClickListener(this);
+        headBackLayout.setOnClickListener(this);
+        headSettingLayout.setOnClickListener(this);
+        settingButton.setOnClickListener(this);
+        firstmeasure.setOnClickListener(this);
+        secondmeasure.setOnClickListener(this);
 
-        View.OnClickListener measure = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                which = v.getId()==R.id.button1?0:1;
-                String h = editTextH.getText().toString();
-                String l = editTextL.getText().toString();
-                String lh = editTextLimitH.getText().toString();
-                if(!"".equals(h) && !"".equals(l) && !"".equals(lh)){
-                    editTextH.setEnabled(false);
-                    editTextL.setEnabled(false);
-                    editTextLimitH.setEnabled(false);
-                    CustomLoadView.getInstance(CalibrateActivity.this, 30000).showProgress("正在发送请求");
-                    new Thread(sender).start();
-                }
-            }
-        };
-        firstmeasure.setOnClickListener(measure);
-        secondmeasure.setOnClickListener(measure);
+        testmeasure.setOnClickListener(this);
     }
 
 
@@ -136,6 +131,7 @@ public class CalibrateActivity  extends AppCompatActivity {
     };
 
     private void onReciveData(String data){
+        if(which==-1) return;
         RespondDecoder decoder = new RespondDecoder();
         if(decoder.initData(data)) {
             Log.d("DeviceDetailActivity", decoder.getResult());
@@ -150,7 +146,23 @@ public class CalibrateActivity  extends AppCompatActivity {
                 if(MeasureBeans.get(1).size()==7)
                     MeasureBeans.get(1).clear();
             }
-            MeasureBeans.get(which).add(new MeasureBean(decoder.getIdentifier(),decoder.getMeasurementDate(),decoder.getTemperature(),decoder.getOffsetVaule()));
+            if(MeasureBeans.get(which).size()<7){
+                MeasureBean mBean = new MeasureBean(decoder.getIdentifier(),decoder.getMeasurementDate(),decoder.getTemperature(),decoder.getOffsetVaule());
+                MeasureBeans.get(which).add(mBean);
+                if(which==0)
+                    firstView.append("\n"+mBean.toString());
+                else{
+                    secondView.append("\n"+mBean.toString());
+                }
+            }
+            if(MeasureBeans.get(which).size()==7) {
+                which=-1;
+                CustomLoadView.getInstance(CalibrateActivity.this).dismissProgress();
+                if(MeasureBeans.size()==2 && MeasureBeans.get(0).size()==7 && MeasureBeans.get(1).size()==7){
+                    calculation();
+                }
+            }
+
 //            new Thread(new Dataloger(sensorid,decoder.get10SavingStr())).start();
         }else{
             ToastUtil.makeTextAndShow("应答数据校验不正确");
@@ -164,7 +176,9 @@ public class CalibrateActivity  extends AppCompatActivity {
             for (SensorBean sensor : sensorList) {
                 cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(), "10"));
                 try {
-                    Thread.sleep(1200);
+                    Thread.sleep(5000);
+                    cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensor.getSensorId(), "10"));
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -173,4 +187,133 @@ public class CalibrateActivity  extends AppCompatActivity {
     };
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.com_head_back:
+            case R.id.com_head_back_layout:
+                CalibrateActivity.this.finish();
+                break;
+            case R.id.com_head_setting:
+            case R.id.com_head_setting_layout:
+                nextActivity();
+                break;
+            case R.id.button1:
+                which=0;
+                onFirstClick();
+                break;
+            case R.id.button2:
+                which=1;
+                onFirstClick();
+                break;
+            case R.id.button3:
+                testmeasure();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    private void nextActivity(){
+        Intent intent = new Intent();
+        intent.setClass(CalibrateActivity.this, CalibrateSettingActivity.class);
+        intent.putExtra(BluetoothDevice.EXTRA_DEVICE,device);
+        startActivity(intent);
+    }
+
+    private void onFirstClick(){
+        String bjgs = SharedPreferencesUtil.readString("bjg","");
+        String zyls = SharedPreferencesUtil.readString("zyl","");
+        String xcs = SharedPreferencesUtil.readString("xc","");
+        MaleType = SharedPreferencesUtil.readInt("maletype",-1);
+        vector = SharedPreferencesUtil.readInt("vector",-1);
+        try{
+            if(!"".equals(bjgs) && !"".equals(zyls) && !"".equals(xcs) && MaleType!=-1 && vector !=-1 ){
+                bjg = Float.parseFloat(bjgs);
+                zyl = Float.parseFloat(zyls);
+                xc = Float.parseFloat(xcs);
+                CustomLoadView.getInstance(CalibrateActivity.this,150000).showProgress("正在测量，请稍后");
+                new Thread(sender).start();
+            }else{
+                new CircleDialog.Builder(this)
+                        .setTitle("提示")
+                        .setText("请先设置标定参数")
+                        .setPositive("确定", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                nextActivity();
+                            }
+                        })
+                        .show();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void calculation(){
+        thirdView.append("\nδy1=1,δy2=1,δy3=1,δy5=1,δy7=1,δy8=1,δy9=1");
+    }
+
+
+    private void testmeasure(){
+        float d1=0,d2=0,d3=0,d5=0,d7=0,d8=0,d9=0;
+        for(int i=0;i<2;i++){
+            MeasureBeans.add(new ArrayList<MeasureBean>());
+            for(int j=0;j<7;j++){
+                String id = "282094650800003";
+                float off = (float)(0-j*0.1);
+                if(j>4)
+                    off = (float)((0-(6-j)*0.1));
+                MeasureBean mBean = new MeasureBean(id+j,"17081617124"+j,28.5f,off);
+                MeasureBeans.get(i).add(mBean);
+                if(i==0)
+                    firstView.append("\n"+mBean.toString());
+                else{
+                    secondView.append("\n"+mBean.toString());
+                }
+            }
+        }
+        float y1 = zyl - MeasureBeans.get(0).get(0).getOffsetValue();
+        float y2 = zyl - MeasureBeans.get(0).get(1).getOffsetValue();
+        float y3 = zyl - MeasureBeans.get(0).get(2).getOffsetValue();
+        float y5 = zyl - MeasureBeans.get(0).get(3).getOffsetValue();
+        float y7 = zyl - MeasureBeans.get(0).get(4).getOffsetValue();
+        float y8 = zyl - MeasureBeans.get(0).get(5).getOffsetValue();
+        float y9 = zyl - MeasureBeans.get(0).get(6).getOffsetValue();
+
+        float y11 = zyl - MeasureBeans.get(1).get(0).getOffsetValue();
+        float y22 = zyl - MeasureBeans.get(1).get(1).getOffsetValue();
+        float y33 = zyl - MeasureBeans.get(1).get(2).getOffsetValue();
+        float y55 = zyl - MeasureBeans.get(1).get(3).getOffsetValue();
+        float y77 = zyl - MeasureBeans.get(1).get(4).getOffsetValue();
+        float y88 = zyl - MeasureBeans.get(1).get(5).getOffsetValue();
+        float y99 = zyl - MeasureBeans.get(1).get(6).getOffsetValue();
+        float k = 0;
+
+
+        int shanggong = y5<bjg?0:1;
+        if(vector==0){ //向1号尺
+            if(shanggong==0){ //上拱
+                d5 = bjg-y5;
+                d3 = 2*(bjg-y55) + d5;
+                k = (d3+d5)/2;
+                d2 =y33-y3+d3-d5+3*k;
+                d1 = y22-y2+d2-d5+4*k;
+                d7 = y7-y77+d5+k;
+                d8 = y8-y88+d7+d5+2*k;
+                d9 = y9-y99+d8+d5+3*k;
+            }else{ //下拱
+                d5 = y5-bjg;
+                d3 = -2*(bjg-y55) + d5;
+                k = (d3+d5)/2;
+
+            }
+
+        }
+        else{ //向9号尺
+
+        }
+    }
 }
