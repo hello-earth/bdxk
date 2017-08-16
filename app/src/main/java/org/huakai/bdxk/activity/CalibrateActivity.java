@@ -259,6 +259,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
 
     private void testmeasure(){
         float d1=0,d2=0,d3=0,d5=0,d7=0,d8=0,d9=0;
+        float dy1=0,dy2=0,dy3=0,dy5=0,dy7=0,dy8=0,dy9=0;
         for(int i=0;i<2;i++){
             MeasureBeans.add(new ArrayList<MeasureBean>());
             for(int j=0;j<7;j++){
@@ -299,7 +300,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
                 d5 = bjg-y5;
                 d3 = 2*(bjg-y55) + d5;
                 k = (d3+d5)/2;
-                d2 =y33-y3+d3-d5+3*k;
+                d2 = y33-y3+d3-d5+3*k;
                 d1 = y22-y2+d2-d5+4*k;
                 d7 = y7-y77+d5+k;
                 d8 = y8-y88+d7+d5+2*k;
@@ -308,12 +309,52 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
                 d5 = y5-bjg;
                 d3 = -2*(bjg-y55) + d5;
                 k = (d3+d5)/2;
-
+                d2 = y3-y33+d3-d5+3*k;
+                d1 = y2-y22+d2-d5+4*k;
+                d7 = y77-y7+d5+k;
+                d8 = y88-y8+d7+d5+2*k;
+                d9 = y99-y9+d8+d5+3*k;
             }
-
         }
         else{ //向9号尺
-
+            if(shanggong==0){//上拱
+                d5 = bjg-y5;
+                d7 = 2*(bjg-y55) + d5;
+                k = (d7+d5)/2;
+                d3 = y3-y33+d5+k;
+                d2 = y2-y22+d3+d5+2*k;
+                d1 = y1-y11+d2+d5+3*k;
+                d8 = y77-y7+d7-d5+3*k;
+                d9 = y88-y8+d8-d5+4*k;
+            }else{
+                d5 = y5-bjg;
+                d7 = -2*(bjg-y55) + d5;
+                k = (d7+d5)/2;
+                d3 = y33-y3+d5+k;
+                d2 = y22-y2+d3+d5+2*k;
+                d1 = y11-y1+d2+d5+3*k;
+                d8 = y7-y77+d7-d5+3*k;
+                d9 = y8-y88+d8-d5+4*k;
+            }
         }
+
+        if(shanggong==0){
+            dy1=bjg-y1+d1;
+            dy2=bjg-y3+d3;
+            dy3=bjg-y3+d3;
+            dy5=bjg-y5-d5;
+            dy7=bjg-y7+d7;
+            dy8=bjg-y8+d8;
+            dy9=bjg-y9+d9;
+        }else{
+            dy1=bjg-y1-d1;
+            dy2=bjg-y3-d3;
+            dy3=bjg-y3-d3;
+            dy5=bjg-y5+d5;
+            dy7=bjg-y7-d7;
+            dy8=bjg-y8-d8;
+            dy9=bjg-y9-d9;
+        }
+        thirdView.append(String.format("\nδy1=%.2f,δy2=%.2f,δy3=%.2f,δy5=%.2f,δy7=%.2f,δy8=%.2f,δy9=%.2f",dy1,dy2,dy3,dy5,dy7,dy8,dy9));
     }
 }
