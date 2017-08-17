@@ -67,6 +67,15 @@ public class SharedPreferencesUtil {
 		return getEditor().commit();
 	}
 
+	public static float readFloat(String key, float defValue) {
+		return getSharedPreferences().getFloat(key, defValue);
+	}
+
+	public static boolean saveFloat(String key, float value) {
+		getEditor().putFloat(key, value);
+		return getEditor().commit();
+	}
+
 	// 布尔值读
 	public static boolean isActive(String key, boolean defaultvalue) {
 		return getSharedPreferences().getBoolean(key, defaultvalue);

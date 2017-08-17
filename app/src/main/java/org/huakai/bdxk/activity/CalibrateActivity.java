@@ -207,7 +207,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
                 onFirstClick();
                 break;
             case R.id.button3:
-                testmeasure();
+                saveFinish();
                 break;
             default:
                 break;
@@ -252,30 +252,31 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
         }
     }
 
-    private void calculation(){
-        thirdView.append("\nδy1=1,δy2=1,δy3=1,δy5=1,δy7=1,δy8=1,δy9=1");
+    private void saveFinish(){
+        this.finish();
     }
 
 
-    private void testmeasure(){
+    private void calculation(){
+//        for(int i=0;i<2;i++){
+//            MeasureBeans.add(new ArrayList<MeasureBean>());
+//            for(int j=0;j<7;j++){
+//                String id = "282094650800003";
+//                float off = (float)(0-j*0.1);
+//                if(j>3)
+//                    off = (float)((0-(6-j)*0.1));
+//                MeasureBean mBean = new MeasureBean(id+j,"17081617124"+j,28.5f,off);
+//                MeasureBeans.get(i).add(mBean);
+//                if(i==0)
+//                    firstView.append("\n"+mBean.toString());
+//                else{
+//                    secondView.append("\n"+mBean.toString());
+//                }
+//            }
+//        }
+
         float d1=0,d2=0,d3=0,d5=0,d7=0,d8=0,d9=0;
         float dy1=0,dy2=0,dy3=0,dy5=0,dy7=0,dy8=0,dy9=0;
-        for(int i=0;i<2;i++){
-            MeasureBeans.add(new ArrayList<MeasureBean>());
-            for(int j=0;j<7;j++){
-                String id = "282094650800003";
-                float off = (float)(0-j*0.1);
-                if(j>4)
-                    off = (float)((0-(6-j)*0.1));
-                MeasureBean mBean = new MeasureBean(id+j,"17081617124"+j,28.5f,off);
-                MeasureBeans.get(i).add(mBean);
-                if(i==0)
-                    firstView.append("\n"+mBean.toString());
-                else{
-                    secondView.append("\n"+mBean.toString());
-                }
-            }
-        }
         float y1 = zyl - MeasureBeans.get(0).get(0).getOffsetValue();
         float y2 = zyl - MeasureBeans.get(0).get(1).getOffsetValue();
         float y3 = zyl - MeasureBeans.get(0).get(2).getOffsetValue();
@@ -340,7 +341,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
 
         if(shanggong==0){
             dy1=bjg-y1+d1;
-            dy2=bjg-y3+d3;
+            dy2=bjg-y2+d2;
             dy3=bjg-y3+d3;
             dy5=bjg-y5-d5;
             dy7=bjg-y7+d7;
@@ -348,13 +349,28 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
             dy9=bjg-y9+d9;
         }else{
             dy1=bjg-y1-d1;
-            dy2=bjg-y3-d3;
+            dy2=bjg-y2-d2;
             dy3=bjg-y3-d3;
             dy5=bjg-y5+d5;
             dy7=bjg-y7-d7;
             dy8=bjg-y8-d8;
             dy9=bjg-y9-d9;
         }
-        thirdView.append(String.format("\nδy1=%.2f,δy2=%.2f,δy3=%.2f,δy5=%.2f,δy7=%.2f,δy8=%.2f,δy9=%.2f",dy1,dy2,dy3,dy5,dy7,dy8,dy9));
+        thirdView.append(String.format(" %s，%s移动\nδy1=%.2f,δy2=%.2f,δy3=%.2f,δy5=%.2f,δy7=%.2f,δy8=%.2f,δy9=%.2f",shanggong==0?"上拱":"下拱",
+                vector==0?"向1号尺":"向9号尺",dy1,dy2,dy3,dy5,dy7,dy8,dy9));
+        SharedPreferencesUtil.saveFloat("y1",y1);
+        SharedPreferencesUtil.saveFloat("y2",y2);
+        SharedPreferencesUtil.saveFloat("y3",y3);
+        SharedPreferencesUtil.saveFloat("y5",y5);
+        SharedPreferencesUtil.saveFloat("y7",y7);
+        SharedPreferencesUtil.saveFloat("y8",y8);
+        SharedPreferencesUtil.saveFloat("y9",y9);
+        SharedPreferencesUtil.saveFloat("dy1",dy1);
+        SharedPreferencesUtil.saveFloat("dy2",dy2);
+        SharedPreferencesUtil.saveFloat("dy3",dy3);
+        SharedPreferencesUtil.saveFloat("dy5",dy5);
+        SharedPreferencesUtil.saveFloat("dy7",dy7);
+        SharedPreferencesUtil.saveFloat("dy8",dy8);
+        SharedPreferencesUtil.saveFloat("dy9",dy9);
     }
 }
