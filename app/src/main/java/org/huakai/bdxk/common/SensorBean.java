@@ -3,6 +3,8 @@ package org.huakai.bdxk.common;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 /**
  * Created by Administrator on 2017/8/7.
  */
@@ -75,5 +77,16 @@ public class SensorBean implements Parcelable {
         dest.writeString(device_mac);
     }
 
+
+    public static String getNameByid(List<SensorBean> sensorList, String keyid){
+        String name = "";
+        for (SensorBean bean : sensorList){
+            if(keyid.equals(bean.getSensorId())){
+                name = bean.getSensorName();
+                break;
+            }
+        }
+        return name;
+    }
 
 }

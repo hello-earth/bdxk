@@ -28,6 +28,7 @@
         <activity android:name=".activity.SensorCommonActivity" />
         <activity android:name=".activity.CalibrateActivity" />
         <activity android:name=".activity.CalibrateSettingActivity" />
+        <activity android:name=".activity.MeasurementActivity" />
     </application>
 
 </manifest>

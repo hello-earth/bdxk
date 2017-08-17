@@ -20,6 +20,7 @@ import org.huakai.bdxk.R;
 import org.huakai.bdxk.common.BlueCmdMgr;
 import org.huakai.bdxk.common.BluetoothHelperService;
 import org.huakai.bdxk.common.ByteUtils;
+import org.huakai.bdxk.common.ComparatorMeasureBean;
 import org.huakai.bdxk.common.MeasureBean;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
@@ -29,6 +30,7 @@ import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by Administrator on 2017/8/15.
@@ -56,7 +58,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
     private int MaleType;
     private int vector;
 
-    private ArrayList<ArrayList<MeasureBean>> MeasureBeans = new ArrayList<ArrayList<MeasureBean>>();
+    private ArrayList<ArrayList<MeasureBean>> MeasureBeans = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,7 +149,8 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
                     MeasureBeans.get(1).clear();
             }
             if(MeasureBeans.get(which).size()<7){
-                MeasureBean mBean = new MeasureBean(decoder.getIdentifier(),decoder.getMeasurementDate(),decoder.getTemperature(),decoder.getOffsetVaule());
+                String name = SensorBean.getNameByid(sensorList,decoder.getIdentifier());
+                MeasureBean mBean = new MeasureBean(decoder.getIdentifier(),name,decoder.getMeasurementDate(),decoder.getTemperature(),decoder.getOffsetVaule());
                 MeasureBeans.get(which).add(mBean);
                 if(which==0)
                     firstView.append("\n"+mBean.toString());
@@ -274,6 +277,11 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
 //                }
 //            }
 //        }
+
+        for(ArrayList<MeasureBean> beans : MeasureBeans){
+            ComparatorMeasureBean comparator=new ComparatorMeasureBean();
+            Collections.sort(beans, comparator);
+        }
 
         float d1=0,d2=0,d3=0,d5=0,d7=0,d8=0,d9=0;
         float dy1=0,dy2=0,dy3=0,dy5=0,dy7=0,dy8=0,dy9=0;

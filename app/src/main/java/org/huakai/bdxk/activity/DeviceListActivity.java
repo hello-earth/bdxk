@@ -23,7 +23,10 @@ import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import org.huakai.bdxk.MyApplication;
 import org.huakai.bdxk.R;
+import org.huakai.bdxk.common.ComparatorMeasureBean;
+import org.huakai.bdxk.common.MeasureBean;
 import org.huakai.bdxk.common.ScanResult;
+import org.huakai.bdxk.common.SensorBean;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.view.CustomLoadView;
@@ -31,6 +34,7 @@ import org.huakai.bdxk.view.OnItemClickListener;
 import org.huakai.bdxk.view.SwipeRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class DeviceListActivity extends AppCompatActivity{
 
@@ -68,13 +72,34 @@ public class DeviceListActivity extends AppCompatActivity{
 
         mRecyclerView.setVisibility(View.GONE);
         emptylayout.setVisibility(View.VISIBLE);
-//        RespondDecoder decoder = new RespondDecoder();
-//        if(decoder.initData("557A100035002820946508000034170811152308FFFF18E1FFFF18E118E1A1E320201FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF42442D44435831352B")) {
-//            String result = decoder.getResult();
-//            Log.i("DeviceListActivity", result);
-//        }else{
-//            ToastUtil.makeTextAndShow("应答数据校验不正确");
-//        }
+
+
+//        ArrayList<MeasureBean> beans = new ArrayList<MeasureBean>();
+//        String name = "1号尺";
+//        MeasureBean mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "2号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "5号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "9号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "7号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "3号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//        name = "8号尺";
+//        mBean = new MeasureBean("2820946508000031",name, "20170817171502", 20.3f, -0.2f);
+//        beans.add(mBean);
+//
+//        ComparatorMeasureBean comparator=new ComparatorMeasureBean();
+//        Collections.sort(beans, comparator);
+//        ArrayList<MeasureBean> aa = beans;
     }
 
     private void initListener(){

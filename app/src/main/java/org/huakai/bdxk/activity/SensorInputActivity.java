@@ -55,13 +55,13 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
 
     private void initSpinnerData() {
         spinnerlist = new ArrayList<>();
-        spinnerlist.add("1号点");
+        spinnerlist.add("1号尺");
         spinnerlist.add("2号点");
         spinnerlist.add("3号点");
-        spinnerlist.add("4号点");
-        spinnerlist.add("5号点");
-        spinnerlist.add("6号点");
-        spinnerlist.add("7号点");
+        spinnerlist.add("5号尺");
+        spinnerlist.add("7号尺");
+        spinnerlist.add("8号尺");
+        spinnerlist.add("9号尺");
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, spinnerlist);
         adapter.setDropDownViewResource(android.R.layout.simple_list_item_single_choice);
         sensorDesc.setAdapter(adapter);

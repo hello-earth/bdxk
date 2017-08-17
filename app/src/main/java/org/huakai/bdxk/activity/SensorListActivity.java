@@ -37,6 +37,7 @@ import org.huakai.bdxk.common.ByteUtils;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
+import org.huakai.bdxk.common.SharedPreferencesUtil;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.db.DevicesCollectionHelper;
 import org.huakai.bdxk.db.SensorCollectionHelper;
@@ -183,7 +184,7 @@ public class SensorListActivity extends AppCompatActivity {
     }
 
     private void showMenu(){
-        final String[] items = {"传感器调零", "设置设备标定", "开始测量"};
+        final String[] items = {"设置标定", "开始测量", "传感器调零"};
         new CircleDialog.Builder(this)
                 .configDialog(new ConfigDialog() {
                     @Override
@@ -218,16 +219,24 @@ public class SensorListActivity extends AppCompatActivity {
     }
 
     private void onMenuClick(int position){
+        if(sensorList.size()!=7){
+            ToastUtil.makeTextAndShow("计算修正系数需要7个传感器节点");
+            return;
+        }
         switch (position){
-            case 0:
+            case 2:
                 CustomLoadView.getInstance(SensorListActivity.this,30000).showProgress("正在发送请求");
                 cmdMgr.sendCmd(ByteUtils.getCmdHexStr(sensorList.get(0).getSensorId(),"80"));
                 break;
+            case 0:
+                nextActivity(device, sensorList,CalibrateActivity.class);
+                break;
             case 1:
-                if(sensorList.size()==7)
-                    nextActivity(device, sensorList,CalibrateActivity.class);
+                float dy5 = SharedPreferencesUtil.readFloat("dy5",9999);
+                if(dy5!=9999)
+                    nextActivity(device, sensorList,MeasurementActivity.class);
                 else
-                    ToastUtil.makeTextAndShow("计算修正系数需要7个传感器节点");
+                    ToastUtil.makeTextAndShow("请先设置标定系数");
                 break;
             default:
                 break;
@@ -274,7 +283,7 @@ public class SensorListActivity extends AppCompatActivity {
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            CustomLoadView.getInstance(MyApplication.getInstance()).dismissProgress();
+            CustomLoadView.getInstance(SensorListActivity.this).dismissProgress();
             switch (msg.what){
                 case MessageType.MESSAGE_CONNECTED:
                     ToastUtil.makeTextAndShow("设备已连接");
