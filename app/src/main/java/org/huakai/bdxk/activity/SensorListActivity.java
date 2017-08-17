@@ -15,6 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -60,6 +61,7 @@ public class SensorListActivity extends AppCompatActivity {
     private LinearLayout emptylayout;
     private LinearLayout headSettingLayout;
     private ImageView settingButton;
+    private Button readValue;
     private Context mContext;
     private LinearLayout headBackLayout;
     private ImageView titleLeft;
@@ -105,6 +107,7 @@ public class SensorListActivity extends AppCompatActivity {
         refreshLayout.setEnableLoadmore(false);
         refreshLayout.setEnableRefresh(false);
         emptylayout = (LinearLayout) findViewById(R.id.emptylayout);
+        readValue = (Button) findViewById(R.id.button2);
     }
 
     private void initListener(){
@@ -152,6 +155,16 @@ public class SensorListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 showMenu();
+            }
+        });
+        readValue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                float dy5 = SharedPreferencesUtil.readFloat("dy5",9999);
+                if(dy5!=9999)
+                    nextActivity(device, sensorList,MeasurementActivity.class);
+                else
+                    ToastUtil.makeTextAndShow("请先设置标定系数");
             }
         });
     }

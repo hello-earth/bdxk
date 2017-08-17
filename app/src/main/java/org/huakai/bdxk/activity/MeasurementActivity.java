@@ -65,17 +65,22 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initData(int position) {
-        if(measureBeans.size()<=currentIndex) return;
-
+        if(measureBeans.size()<currentIndex) return;
+        if(measureBeans.size()==currentIndex) {
+            tableView.removeAllViews();
+            return;
+        }
+        tableView.removeAllViews();
         ArrayList<MeasureBean> measureBean = measureBeans.get(position);
         if(measureBean.size()==7){
             ArrayList<TableCellData> cellDatas = new ArrayList<>() ;
-            for(MeasureBean bean : measureBean){
-                cellDatas.add(new TableCellData(bean.getIdentifier(), 0, 0));
-                cellDatas.add(new TableCellData(bean.getSensorName(), 0, 1));
-                cellDatas.add(new TableCellData(bean.getTemperature()+"", 0, 2));
-                cellDatas.add(new TableCellData(bean.getOffsetValue()+"", 0, 3));
-                cellDatas.add(new TableCellData(bean.getMeasurementDate(), 0, 4));
+            for(int i =0; i<measureBean.size();i++){
+                MeasureBean bean = measureBean.get(i);
+                cellDatas.add(new TableCellData(bean.getIdentifier(), i, 0));
+                cellDatas.add(new TableCellData(bean.getSensorName(), i, 1));
+                cellDatas.add(new TableCellData(bean.getTemperature()+"", i, 2));
+                cellDatas.add(new TableCellData(bean.getOffsetValue()+"", i, 3));
+                cellDatas.add(new TableCellData(bean.getMeasurementDate(), i, 4));
             }
             LinkedHashMap columns = initTabViewHeader();
             SimpleTableDataAdapter dataAdapter = new SimpleTableDataAdapter(this, cellDatas, 4);
@@ -121,6 +126,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
                 break;
             case R.id.button1:
                 if(currentIndex>0) currentIndex--;
+                if(currentIndex==0) lastplate.setVisibility(View.GONE);
                 initData(currentIndex);
                 break;
             case R.id.button2:
@@ -129,6 +135,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             case R.id.button3:
                 if(measureBeans.size()-currentIndex>0){
                     currentIndex++;
+                    lastplate.setVisibility(View.VISIBLE);
                     initData(currentIndex);
                 }
                 break;
@@ -177,6 +184,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             measureBeans.add(currentIndex,new ArrayList<MeasureBean>());
             beans = measureBeans.get(currentIndex);
         }
+        if(beans.size()==7) return;
         if(decoder.initData(data)) {
             if(beans.size()<7) {
                 String name = SensorBean.getNameByid(sensorList,decoder.getIdentifier());
