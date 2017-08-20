@@ -40,7 +40,7 @@ public class MeasureBean {
     public String getSensorName(){return sensorName;}
 
     public String toString(){
-        return identifier+","+sensorName+","+measurementDate+","+temperature+","+offsetValue;
+        return sensorName+","+measurementDate+","+temperature+","+offsetValue;
     }
 
     public void setWhichplate(int value){

@@ -179,7 +179,7 @@ public class DeviceListActivity extends AppCompatActivity{
                     .setCanceledOnTouchOutside(false)
                     .setCancelable(true)
                     .setTitle("初始化节点名称")
-                    .setInputHint("请该设备节点备注")
+                    .setInputHint("请输入该设备节点备注")
                     .configInput(new ConfigInput() {
                         @Override
                         public void onConfig(InputParams params) {

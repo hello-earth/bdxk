@@ -23,9 +23,17 @@
         android:id="@+id/tableview"
         android:layout_below="@id/plate_no"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp" />
 
+
+    <TextView
+        android:id="@+id/remarksview"
+        android:layout_below="@id/tableview"
+        android:layout_above="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp" />
 
     <LinearLayout
         android:id="@+id/button_layout"
@@ -34,13 +42,13 @@
         android:orientation="horizontal"
         android:padding="10dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="5dp">
 
         <Button
             android:text="上一块"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
+            android:layout_margin="3dp"
             android:layout_weight="1"
             android:scrollbars="vertical"
             android:fadeScrollbars="false"

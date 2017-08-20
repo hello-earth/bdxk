@@ -366,6 +366,7 @@ public class CalibrateActivity  extends AppCompatActivity implements View.OnClic
         }
         thirdView.append(String.format(" %s，%s移动\nδy1=%.2f,δy2=%.2f,δy3=%.2f,δy5=%.2f,δy7=%.2f,δy8=%.2f,δy9=%.2f",shanggong==0?"上拱":"下拱",
                 vector==0?"向1号尺":"向9号尺",dy1,dy2,dy3,dy5,dy7,dy8,dy9));
+        SharedPreferencesUtil.saveInt("vector",vector);
         SharedPreferencesUtil.saveFloat("y1",y1);
         SharedPreferencesUtil.saveFloat("y2",y2);
         SharedPreferencesUtil.saveFloat("y3",y3);

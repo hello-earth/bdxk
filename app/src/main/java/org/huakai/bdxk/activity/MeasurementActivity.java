@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +28,7 @@ import org.huakai.bdxk.common.MeasureBean;
 import org.huakai.bdxk.common.MessageType;
 import org.huakai.bdxk.common.RespondDecoder;
 import org.huakai.bdxk.common.SensorBean;
+import org.huakai.bdxk.common.SharedPreferencesUtil;
 import org.huakai.bdxk.common.ToastUtil;
 import org.huakai.bdxk.view.CustomLoadView;
 
@@ -45,6 +47,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
     private Button readValue;
     private Button nextplate;
     private TextView plateNo;
+    private TextView remarks;
     private TableView tableView;
     private BluetoothDevice device;
     private static BlueCmdMgr cmdMgr;
@@ -65,22 +68,26 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
     }
 
     private void initData(int position) {
-        if(measureBeans.size()<currentIndex) return;
-        if(measureBeans.size()==currentIndex) {
-            tableView.removeAllViews();
-            return;
-        }
+        remarks.setText("");
         tableView.removeAllViews();
+        if(measureBeans.size()<=currentIndex) return;
+
         ArrayList<MeasureBean> measureBean = measureBeans.get(position);
         if(measureBean.size()==7){
+            String msg = "";
             ArrayList<TableCellData> cellDatas = new ArrayList<>() ;
             for(int i =0; i<measureBean.size();i++){
                 MeasureBean bean = measureBean.get(i);
-                cellDatas.add(new TableCellData(bean.getIdentifier(), i, 0));
-                cellDatas.add(new TableCellData(bean.getSensorName(), i, 1));
-                cellDatas.add(new TableCellData(bean.getTemperature()+"", i, 2));
-                cellDatas.add(new TableCellData(bean.getOffsetValue()+"", i, 3));
-                cellDatas.add(new TableCellData(bean.getMeasurementDate(), i, 4));
+//                cellDatas.add(new TableCellData(bean.getIdentifier(), i, 0));
+                cellDatas.add(new TableCellData(bean.getSensorName(), i, 0));
+                cellDatas.add(new TableCellData(bean.getTemperature()+"", i, 1));
+                cellDatas.add(new TableCellData(bean.getOffsetValue()+"", i, 2));
+                cellDatas.add(new TableCellData(bean.getMeasurementDate(), i, 3));
+                msg += String.format("%s: %s",bean.getSensorName(),bean.getIdentifier());
+                if(i%2==1)
+                    msg += "\n";
+                else
+                    msg += ";";
             }
             LinkedHashMap columns = initTabViewHeader();
             SimpleTableDataAdapter dataAdapter = new SimpleTableDataAdapter(this, cellDatas, 4);
@@ -90,6 +97,10 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             headerAdapter.setTextSize(14);
             tableView.setTableAdapter(headerAdapter,dataAdapter);
             tableView.setHeaderElevation(18);
+            msg+=String.format("\n%s移动；δy1=%.2f；δy2=%.2f；δy3=%.2f；δy5=%.2f；δy7=%.2f；δy8=%.2f；δy9=%.2f",
+                    SharedPreferencesUtil.readInt("vector",0)==0?"向1号尺":"向9号尺",SharedPreferencesUtil.readFloat("dy1",0),SharedPreferencesUtil.readFloat("dy2",0),
+                    SharedPreferencesUtil.readFloat("dy3",0),SharedPreferencesUtil.readFloat("dy5",0),SharedPreferencesUtil.readFloat("dy7",0),SharedPreferencesUtil.readFloat("dy8",0),SharedPreferencesUtil.readFloat("dy9",0));
+            remarks.setText(msg);
         }
     }
 
@@ -104,9 +115,11 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
         nextplate = (Button)findViewById(R.id.button3);
         plateNo = (TextView)findViewById(R.id.plate_no);
         plateNo.setText("当前第1块板");
+        remarks = (TextView)findViewById(R.id.remarksview);
         lastplate.setVisibility(View.GONE);
         tableView = (TableView)findViewById(R.id.tableview);
         currentIndex = 0;
+        remarks.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     private void initListener(){
@@ -127,6 +140,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             case R.id.button1:
                 if(currentIndex>0) currentIndex--;
                 if(currentIndex==0) lastplate.setVisibility(View.GONE);
+                plateNo.setText("当前第"+(currentIndex+1)+"块板");
                 initData(currentIndex);
                 break;
             case R.id.button2:
@@ -135,6 +149,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             case R.id.button3:
                 if(measureBeans.size()-currentIndex>0){
                     currentIndex++;
+                    plateNo.setText("当前第"+(currentIndex+1)+"块板");
                     lastplate.setVisibility(View.VISIBLE);
                     initData(currentIndex);
                 }
@@ -202,11 +217,11 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
 
     private LinkedHashMap initTabViewHeader(){
         LinkedHashMap columns = new LinkedHashMap<>();
-        columns.put(0,new Pair<>("传感器编号",1));
-        columns.put(1,new Pair<>("传感器名称",1));
-        columns.put(2,new Pair<>("温度℃",1));
-        columns.put(3,new Pair<>("偏移",1));
-        columns.put(4,new Pair<>("测量日期",1));
+//        columns.put(0,new Pair<>("传感器编号",1));
+        columns.put(0,new Pair<>("传感器名称",1));
+        columns.put(1,new Pair<>("温度℃",1));
+        columns.put(2,new Pair<>("偏移",1));
+        columns.put(3,new Pair<>("测量日期",1));
         return columns;
     }
 
