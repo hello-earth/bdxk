@@ -12,6 +12,7 @@ public class MeasureBean {
     private String measurementDate;
     private float temperature;
     private float offsetValue;
+    private float warp;
 
     public MeasureBean(String _identifier, String _sensorName, String _measurementDate, float _temperature, float _offsetValue){
         this.identifier=_identifier;
@@ -36,6 +37,15 @@ public class MeasureBean {
     public float getOffsetValue(){
         return offsetValue;
     }
+
+    public void setWarp(float value){
+        this.warp = value;
+    }
+
+    public float getWarp(){
+        return this.warp;
+    }
+
 
     public String getSensorName(){return sensorName;}
 

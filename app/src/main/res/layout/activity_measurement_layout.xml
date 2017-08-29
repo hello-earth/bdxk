@@ -11,29 +11,39 @@
         android:id="@+id/head_title_layout"
         layout="@layout/activity_common_header" />
 
-    <TextView
-        android:id="@+id/plate_no"
-        android:layout_below="@id/head_title_layout"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"/>
-
-
-    <com.wjk.tableview.TableView
-        android:id="@+id/tableview"
-        android:layout_below="@id/plate_no"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp" />
-
-
-    <TextView
-        android:id="@+id/remarksview"
-        android:layout_below="@id/tableview"
+        android:layout_height="match_parent"
         android:layout_above="@+id/button_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp" />
+        android:layout_below="@id/head_title_layout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/plate_no"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"/>
+
+
+            <com.wjk.tableview.TableView
+                android:id="@+id/tableview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp" />
+
+
+            <TextView
+                android:id="@+id/remarksview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/button_layout"

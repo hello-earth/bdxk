@@ -56,8 +56,8 @@ public class SensorInputActivity extends AppCompatActivity implements View.OnCli
     private void initSpinnerData() {
         spinnerlist = new ArrayList<>();
         spinnerlist.add("1号尺");
-        spinnerlist.add("2号点");
-        spinnerlist.add("3号点");
+        spinnerlist.add("2号尺");
+        spinnerlist.add("3号尺");
         spinnerlist.add("5号尺");
         spinnerlist.add("7号尺");
         spinnerlist.add("8号尺");

@@ -78,11 +78,11 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             ArrayList<TableCellData> cellDatas = new ArrayList<>() ;
             for(int i =0; i<measureBean.size();i++){
                 MeasureBean bean = measureBean.get(i);
-//                cellDatas.add(new TableCellData(bean.getIdentifier(), i, 0));
                 cellDatas.add(new TableCellData(bean.getSensorName(), i, 0));
                 cellDatas.add(new TableCellData(bean.getTemperature()+"", i, 1));
                 cellDatas.add(new TableCellData(bean.getOffsetValue()+"", i, 2));
-                cellDatas.add(new TableCellData(bean.getMeasurementDate(), i, 3));
+                cellDatas.add(new TableCellData(String.format("%.2f",bean.getWarp()), i, 3));
+                cellDatas.add(new TableCellData(bean.getMeasurementDate(), i, 4));
                 msg += String.format("%s: %s",bean.getSensorName(),bean.getIdentifier());
                 if(i%2==1)
                     msg += "\n";
@@ -90,7 +90,7 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
                     msg += ";";
             }
             LinkedHashMap columns = initTabViewHeader();
-            SimpleTableDataAdapter dataAdapter = new SimpleTableDataAdapter(this, cellDatas, 4);
+            SimpleTableDataAdapter dataAdapter = new SimpleTableDataAdapter(this, cellDatas, 5);
             dataAdapter.setTextSize(12);
             TableHeaderColumnModel columnModel = new TableHeaderColumnModel(columns);
             SimpleTableHeaderAdapter headerAdapter = new SimpleTableHeaderAdapter(this,columnModel);
@@ -119,7 +119,6 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
         lastplate.setVisibility(View.GONE);
         tableView = (TableView)findViewById(R.id.tableview);
         currentIndex = 0;
-        remarks.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     private void initListener(){
@@ -204,24 +203,82 @@ public class MeasurementActivity extends AppCompatActivity implements View.OnCli
             if(beans.size()<7) {
                 String name = SensorBean.getNameByid(sensorList,decoder.getIdentifier());
                 MeasureBean mBean = new MeasureBean(decoder.getIdentifier(),name, decoder.getMeasurementDate(), decoder.getTemperature(), decoder.getOffsetVaule());
+                mBean.setWhichplate(currentIndex);
                 beans.add(mBean);
             }
             if(beans.size()==7) {
                 ComparatorMeasureBean comparator=new ComparatorMeasureBean();
                 Collections.sort(beans, comparator);
                 CustomLoadView.getInstance(MeasurementActivity.this).dismissProgress();
+                calculation();
                 initData(currentIndex);
             }
+        }
+    }
+
+    private void calculation(){
+        float d1=0,d2=0,d3=0,d5=0,d7=0,d8=0,d9=0;
+        float dd1=0,dd2=0,dd3=0,dd5=0,dd7=0,dd8=0,dd9=0;
+        float dy1=0,dy2=0,dy3=0,dy5=0,dy7=0,dy8=0,dy9=0;
+        String bjgs = SharedPreferencesUtil.readString("bjg","");
+        String zyls = SharedPreferencesUtil.readString("zyl","");
+        int vector = 0;//SharedPreferencesUtil.readInt("vector",0);
+        if(!"".equals(bjgs) && !"".equals(zyls) && vector !=-1 ) {
+            float bjg = Float.parseFloat(bjgs);
+            float zyl = Float.parseFloat(zyls);
+
+            float y1 = zyl - measureBeans.get(currentIndex).get(0).getOffsetValue();
+            float y2 = zyl - measureBeans.get(currentIndex).get(1).getOffsetValue();
+            float y3 = zyl - measureBeans.get(currentIndex).get(2).getOffsetValue();
+            float y5 = zyl - measureBeans.get(currentIndex).get(3).getOffsetValue();
+            float y7 = zyl - measureBeans.get(currentIndex).get(4).getOffsetValue();
+            float y8 = zyl - measureBeans.get(currentIndex).get(5).getOffsetValue();
+            float y9 = zyl - measureBeans.get(currentIndex).get(6).getOffsetValue();
+            dy1 = SharedPreferencesUtil.readFloat("dy1",0);
+            dy2 = SharedPreferencesUtil.readFloat("dy2",0);
+            dy3 = SharedPreferencesUtil.readFloat("dy3",0);
+            dy5 = SharedPreferencesUtil.readFloat("dy5",0);
+            dy7 = SharedPreferencesUtil.readFloat("dy7",0);
+            dy8 = SharedPreferencesUtil.readFloat("dy8",0);
+            dy9 = SharedPreferencesUtil.readFloat("dy9",0);
+
+            int shanggong = y5 < bjg ? 0 : 1;
+
+            if (shanggong == 0) { //上拱
+                dd1 = dy1-bjg+y1;
+                dd2 = dy2-bjg+y2;
+                dd3 = dy3-bjg+y3;
+                dd5 = bjg-y5-dy5;
+                dd7 = dy7-bjg+y7;
+                dd8 = dy8-bjg+y8;
+                dd9 = dy9-bjg+y9;
+            } else { //下拱
+                dd1 = bjg-dy1-y1;
+                dd2 = bjg-dy2-y2;
+                dd3 = bjg-dy3-y3;
+                dd5 = dy5-bjg+y5;
+                dd7 = bjg-dy7-y7;
+                dd8 = bjg-dy8-y8;
+                dd9 = bjg-dy9-y9;
+            }
+            measureBeans.get(currentIndex).get(0).setWarp(dd1);
+            measureBeans.get(currentIndex).get(1).setWarp(dd2);
+            measureBeans.get(currentIndex).get(2).setWarp(dd3);
+            measureBeans.get(currentIndex).get(3).setWarp(dd5);
+            measureBeans.get(currentIndex).get(4).setWarp(dd7);
+            measureBeans.get(currentIndex).get(5).setWarp(dd8);
+            measureBeans.get(currentIndex).get(6).setWarp(dd9);
         }
     }
 
     private LinkedHashMap initTabViewHeader(){
         LinkedHashMap columns = new LinkedHashMap<>();
 //        columns.put(0,new Pair<>("传感器编号",1));
-        columns.put(0,new Pair<>("传感器名称",1));
+        columns.put(0,new Pair<>("尺名称",1));
         columns.put(1,new Pair<>("温度℃",1));
         columns.put(2,new Pair<>("偏移",1));
-        columns.put(3,new Pair<>("测量日期",1));
+        columns.put(3,new Pair<>("翘曲",1));
+        columns.put(4,new Pair<>("测量日期",1));
         return columns;
     }
 
