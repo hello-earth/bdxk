@@ -17,10 +17,10 @@ import com.wjk.tableview.common.TableHeaderColumnModel;
  */
 public final class SimpleTableHeaderAdapter extends TableHeaderAdapter {
 
-    private int paddingLeft = 20;
-    private int paddingTop = 30;
-    private int paddingRight = 20;
-    private int paddingBottom = 30;
+    private int paddingLeft = 10;
+    private int paddingTop = 20;
+    private int paddingRight = 10;
+    private int paddingBottom = 20;
     private int textSize = 18;
     private int typeface = Typeface.BOLD;
     private int textColor = 0x99ffffff;
